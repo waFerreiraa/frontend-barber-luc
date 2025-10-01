@@ -1,0 +1,85 @@
+/* src/components/Navigation.css */
+.sidebar {
+  width: 250px;
+  background-color: #121212;
+  height: 100vh;
+  padding: 1.5rem;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+  flex-shrink: 0;
+}
+
+.sidebar-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-header h2 {
+  margin: 0;
+  font-family: 'Georgia', serif;
+  font-size: 1.8rem;
+  color: var(--primary-color);
+}
+
+.sidebar-header span {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar ul li {
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+  font-weight: 600;
+}
+
+.sidebar ul li:hover {
+  background-color: var(--primary-color);
+  color: #1a1a1a;
+}
+/* src/components/Navigation.css */
+
+/* ... (todo o seu CSS que já estava aqui) ... */
+
+/* NOVO: Botão de fechar que só aparece no mobile */
+.close-button {
+  display: none;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 2.5rem;
+  background: none;
+  border: none;
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+
+/* --- Media Query para o Menu Lateral --- */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed; /* Fica por cima do conteúdo */
+    left: 0;
+    top: 0;
+    z-index: 1001;
+    transform: translateX(-100%); /* Esconde o menu para a esquerda */
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .sidebar.open {
+    transform: translateX(0); /* Mostra o menu */
+  }
+
+  .close-button {
+    display: block; /* Mostra o botão de fechar */
+  }
+}

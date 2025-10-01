@@ -1,0 +1,195 @@
+/* src/index.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+:root {
+  --bg-color: #1a1a1a;
+  --surface-color: #242424;
+  --primary-color: #ffffff; /* Dourado */
+  --text-color: rgba(255, 255, 255, 0.87);
+  --border-color: #444;
+}
+
+/* Reset básico */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.5;
+}
+
+#root {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 2rem;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+h1, h3 {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.card {
+  background-color: var(--surface-color);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+input, select {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  background-color: #333;
+  color: var(--text-color);
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.button {
+  background-color: var(--primary-color);
+  color: #1a1a1a;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.button:hover {
+  background-color: #c09b2d;
+}
+
+.button:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+/* Estilos para o botão Hambúrguer, Overlay e ajustes gerais */
+.hamburger-button {
+  display: none; /* Escondido por padrão em telas grandes */
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  font-size: 2rem;
+  background: var(--surface-color);
+  color: var(--primary-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 100;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  padding: 0;
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+/* --- Media Query para Telas Menores (Celulares e Tablets em modo retrato) --- */
+@media (max-width: 768px) {
+  #root {
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .main-content {
+    padding: 1rem;
+    padding-top: 4rem; /* Espaço para o botão hambúrguer não sobrepor o título */
+    height: auto; /* Remove altura fixa para permitir expansão */
+    min-height: calc(100vh - 4rem);
+  }
+
+  .hamburger-button {
+    display: block; /* Mostra o botão em telas pequenas */
+  }
+
+  .overlay {
+    display: block; /* Mostra o overlay quando o menu estiver aberto (controlado via JS) */
+  }
+
+  .grid-container {
+    /* Força uma única coluna em telas pequenas */
+    grid-template-columns: 1fr;
+  }
+
+  /* Ajuste no histórico para empilhar as informações */
+  .historico-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+/* --- Media Query ESPECÍFICA para o componente de Registro de Vendas --- */
+@media (max-width: 600px) {
+  /* Reset para componentes RV (Registro de Vendas) */
+  html, body {
+    overflow-x: hidden;
+  }
+  
+  #root {
+    display: block; /* Remove flex para páginas específicas como RV */
+    height: auto;
+  }
+  
+  .main-content {
+    padding: 0; /* Remove padding para componentes full-screen */
+    height: auto;
+    min-height: 100vh;
+  }
+}
