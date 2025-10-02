@@ -1,24 +1,21 @@
-// src/pages/Historico.jsx
 import React, { useState, useEffect } from 'react';
 import { fetchHistorico } from '../services/api';
 import Logo from "../assets/penteado.png";
 import Lucao from "../assets/LucaoLogo.png";
-// Reaproveita o CSS principal do app (RegistrarVenda.css)
 import './RegistrarVenda.css';
-// Estilos específicos do histórico (adicionais)
 import './Historico.css';
 
-const Historico = () => {
+const Historico = ({ token, usuario }) => {
   const [vendas, setVendas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [expandedVendaId, setExpandedVendaId] = useState(null);
+  const [expandedDate, setExpandedDate] = useState(null);
 
   useEffect(() => {
     const getHistorico = async () => {
       try {
         setLoading(true);
-        const data = await fetchHistorico();
+        const data = await fetchHistorico(token); 
         setVendas(data || []);
       } catch (err) {
         setError(err.message || 'Erro ao carregar histórico.');
@@ -27,33 +24,33 @@ const Historico = () => {
       }
     };
     getHistorico();
-  }, []);
+  }, [token]);
 
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    const options = {
-      year: 'numeric', month: 'long', day: 'numeric',
-      hour: '2-digit', minute: '2-digit'
-    };
-    return new Date(dateString).toLocaleString('pt-BR', options);
+  // Agrupa vendas por dia
+  const vendasPorDia = vendas.reduce((acc, venda) => {
+    const dataStr = new Date(venda.data_venda).toLocaleDateString('pt-BR');
+    if (!acc[dataStr]) acc[dataStr] = [];
+    acc[dataStr].push(venda);
+    return acc;
+  }, {});
+
+  const toggleDateDetails = (date) => {
+    setExpandedDate(expandedDate === date ? null : date);
   };
 
-  const toggleVendaDetails = (id) => {
-    setExpandedVendaId(expandedVendaId === id ? null : id);
+  const formatCurrency = (value) => {
+    return Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   };
 
   return (
     <div className="rv-container">
-      {/* HEADER FIXO (mesma estrutura dos outros pages) */}
       <header className="rv-header" role="banner">
-        
         <div className="rv-header-text">Barbearia Lucão</div>
         <div className="rv-header-logo">
           <img src={Logo} alt="Logo da Barbearia Lucão" />
         </div>
       </header>
 
-      {/* CARD PRINCIPAL - ocupa todo o espaço abaixo do header */}
       <main className="rv-main-card" role="main">
         <div className="rv-top-visuals" aria-hidden="true">
           <span role="img" aria-label="barber pole">💈</span>
@@ -63,55 +60,67 @@ const Historico = () => {
           <span role="img" aria-label="barber pole">💈</span>
         </div>
 
-        <h2>📜 Histórico de Vendas</h2>
+        <h2>📜 Histórico de Vendas - Ganhos por Dia</h2>
 
         {loading && <p>Carregando histórico...</p>}
         {error && <p className="rv-message rv-error">{error}</p>}
 
         {!loading && !error && (
-          vendas.length === 0 ? (
+          Object.keys(vendasPorDia).length === 0 ? (
             <p>Nenhuma venda registrada ainda.</p>
           ) : (
             <ul className="rv-historico-list">
-              {vendas.map(venda => (
-                <li
-                  key={venda.id}
-                  className="rv-historico-item"
-                  onClick={() => toggleVendaDetails(venda.id)}
-                >
-                  <div className="rv-historico-header">
-                    <div className="rv-historico-meta">
-                      <div className="rv-historico-client">
-                        <strong>{venda.cliente_nome}</strong>
+              {Object.entries(vendasPorDia).map(([data, vendasDoDia]) => {
+                
+                // Agrupa vendas do dia por colaborador (quem vendeu)
+                const vendasPorColaborador = vendasDoDia.reduce((acc, v) => {
+                  const nomeColab = v.usuario_nome || 'Colaborador';
+                  if (!acc[nomeColab]) acc[nomeColab] = [];
+                  acc[nomeColab].push(v);
+                  return acc;
+                }, {});
+
+                // Total do dia
+                const totalDoDia = vendasDoDia.reduce((sum, v) => sum + Number(v.valor_total || 0), 0);
+
+                return (
+                  <li key={data} className="rv-historico-item" onClick={() => toggleDateDetails(data)}>
+                    <div className="rv-historico-header">
+                      <div className="rv-historico-meta">
+                        <div className="rv-historico-date">
+                          <strong>{data}</strong>
+                        </div>
                       </div>
-                      <div className="rv-historico-date">{formatDate(venda.data_venda)}</div>
+                      <div className="rv-historico-total">
+                        <strong>{formatCurrency(totalDoDia)}</strong>
+                      </div>
                     </div>
 
-                    <div className="rv-historico-total">
-                      <strong>
-                        {(Number(venda.valor_total) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                      </strong>
-                    </div>
-                  </div>
-
-                  {expandedVendaId === venda.id && (
-                    <div className="rv-historico-details">
-                      <h4>Itens</h4>
-                      <ul className="rv-historico-items-list">
-                        {Array.isArray(venda.itens) && venda.itens.length > 0 ? (
-                          venda.itens.map((item, idx) => (
-                            <li key={idx} className="rv-historico-item-detail">
-                              {item.nome} — {(Number(item.valor_cobrado) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                            </li>
-                          ))
-                        ) : (
-                          <li className="rv-historico-item-detail">Nenhum item registrado</li>
-                        )}
-                      </ul>
-                    </div>
-                  )}
-                </li>
-              ))}
+                    {expandedDate === data && (
+                      <div className="rv-historico-details">
+                        <h4>Vendas do Dia por Colaborador</h4>
+                        <ul className="rv-historico-items-list">
+                          {Object.entries(vendasPorColaborador).map(([colab, vendasDoColab]) => {
+                            const totalColab = vendasDoColab.reduce((sum, v) => sum + Number(v.valor_total || 0), 0);
+                            return (
+                              <li key={colab} className="rv-historico-item-detail">
+                                <strong>👤 {colab} — 💰 {formatCurrency(totalColab)}</strong>
+                                <ul>
+                                  {vendasDoColab.map((venda) => (
+                                    <li key={venda.id}>
+                                      🧑‍🤝‍🧑 {venda.cliente_nome || 'Cliente não informado'} — 💈 {formatCurrency(venda.valor_total || 0)} — 📦 {venda.venda_itens?.length || 0} itens
+                                    </li>
+                                  ))}
+                                </ul>
+                              </li>
+                            )
+                          })}
+                        </ul>
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           )
         )}
