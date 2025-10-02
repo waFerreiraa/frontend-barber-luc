@@ -312,14 +312,15 @@
 .rv-submit-button {
     width: 100%;
     padding: 1rem;
-    margin-top: 1.5rem;
+    margin-top: 1.6rem;
     background-color: #1a1a1a;
     color: white;
     border: none;
     border-radius: 12px;
-    font-size: 1.2rem;
+    font-size: 1.8rem;
     font-weight: 700;
     cursor: pointer;
+    padding-bottom: 50px;
     transition: background-color 0.2s;
 }
 

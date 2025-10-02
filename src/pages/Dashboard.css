@@ -282,6 +282,8 @@
     background-color: #333;
 }
 
+
+
 /* --- Responsivo para Mobile --- */
 @media (max-width: 600px) {
     .dashboard-container {
