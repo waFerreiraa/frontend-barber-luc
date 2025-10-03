@@ -28,7 +28,7 @@ const Historico = ({ token, usuario }) => {
 
   // Agrupa vendas por dia
   const vendasPorDia = vendas.reduce((acc, venda) => {
-    const dataStr = new Date(venda.data_venda).toLocaleDateString('pt-BR');
+    const dataStr = new Date(venda.data_venda).toLocaleDateString('pt-BR', {timeZone: 'America/Sao_paulo'});
     if (!acc[dataStr]) acc[dataStr] = [];
     acc[dataStr].push(venda);
     return acc;

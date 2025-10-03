@@ -22,6 +22,7 @@ const RegistrarVenda = ({ setCurrentPage }) => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [abaAtiva, setAbaAtiva] = useState('cortes');
+    const [loading, setLoading] = useState(false);
 
     const loadData = async () => {
         try {
@@ -76,35 +77,43 @@ const RegistrarVenda = ({ setCurrentPage }) => {
     };
 
     const handleSubmit = async () => {
-        setError('');
-        setSuccess('');
+  setError('');
+  setSuccess('');
+  setLoading(true); // 👈 Ativa o carregamento
 
-        if (!nomeCliente || itens.length === 0) {
-            setError('Digite o nome do cliente e adicione pelo menos um serviço.');
-            return;
-        }
-        try {
-            const cliente = await getOrCreateCliente();
-            const valorTotalEmReais = totalEmCentavos / 100;
+  if (!nomeCliente || itens.length === 0) {
+    setError('Digite o nome do cliente e adicione pelo menos um serviço.');
+    setLoading(false); // 👈 Desativa em caso de erro
+    return;
+  }
 
-            const vendaData = {
-                cliente_id: cliente.id,
-                valor_total: valorTotalEmReais,
-                itens: itens.map(item => ({
-                    servico_id: item.servico_id,
-                    valor_cobrado: item.valor_em_centavos / 100
-                })),
-            };
+  try {
+    const cliente = await getOrCreateCliente();
+    const valorTotalEmReais = totalEmCentavos / 100;
 
-            await createVenda(vendaData);
-            setSuccess(`Venda para "${cliente.nome}" registrada com sucesso!`);
-            setNomeCliente('');
-            setItens([]);
-
-        } catch (err) {
-            setError(err.message);
-        }
+    const vendaData = {
+      cliente_id: cliente.id,
+      valor_total: valorTotalEmReais,
+      itens: itens.map(item => ({
+        servico_id: item.servico_id,
+        valor_cobrado: item.valor_em_centavos / 100
+      })),
     };
+
+    await createVenda(vendaData);
+    setSuccess(`Venda para "${cliente.nome}" registrada com sucesso!`);
+    setNomeCliente('');
+    setItens([]);
+
+    console.log("venda finalizada ✅");
+  } catch (err) {
+    console.log(err, "erro ao finalizar venda");
+    setError(err.message);
+  } finally {
+    setLoading(false); // 👈 Sempre desliga o carregando no final
+  }
+};
+
     
     const getServiceIcon = (serviceName) => {
         const name = serviceName.toLowerCase();
@@ -167,7 +176,7 @@ const RegistrarVenda = ({ setCurrentPage }) => {
                 onClick={handleSubmit}
                 disabled={!nomeCliente || itens.length === 0}
             >
-                Finalizar Venda
+                {loading ? (<span className="spinner"></span>) : ("Finalizar venda")}
             </button>
         </>
     );
