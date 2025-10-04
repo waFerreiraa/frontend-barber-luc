@@ -6,6 +6,26 @@ const getAuthHeaders = () => {
   return token ? { 'Authorization': `Bearer ${token}` } : {};
 };
 
+// services/api.js
+export const excluirVendaCliente = async (vendaId) => {
+  const response = await fetch(`${BASE_URL}/api/vendas/${vendaId}/excluir-cliente`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders()
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Erro ao excluir venda/cliente");
+  }
+
+  return response.json();
+};
+
+
+
 
 const handleResponse = async (response) => {
   if (!response.ok) {
