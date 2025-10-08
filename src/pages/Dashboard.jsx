@@ -160,7 +160,7 @@ const [anoSelecionado, setAnoSelecionado] = useState(new Date().getFullYear());
         </div>
 
         <section className="dashboard-content">
-          <h3>📊 Dashboard - Resumo Financeiro</h3>
+          <h3>Dashboard - Resumo Financeiro</h3>
 
           <div className="dashboard-cards-grid">
             <div className="dashboard-card dashboard-card-day">
