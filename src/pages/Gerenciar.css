@@ -1,0 +1,160 @@
+/* Gerenciar.css */
+
+/* Container principal */
+.gerenciar-container {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #1a1a1a;
+    padding: 2rem 1rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #fff;
+}
+
+/* Título da página */
+.gerenciar-container h1 {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+/* Mensagens de sucesso e erro */
+.gerenciar-container p {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+.gerenciar-error {
+    color: #ff4444;
+}
+
+.gerenciar-success {
+    color: #4CAF50;
+}
+
+/* Grid para os cards */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    width: 100%;
+    max-width: 900px;
+}
+
+/* Card */
+.gerenciar-card {
+    background-color: #222;
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Títulos dentro do card */
+.gerenciar-card h3, .gerenciar-card h4 {
+    margin: 0 0 1rem 0;
+    color: #ff9800;
+    font-weight: 600;
+}
+
+/* Formulários */
+.gerenciar-card form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Inputs e labels */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.form-group label {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.form-group input {
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #666;
+    background-color: #333;
+    color: #fff;
+    font-size: 1rem;
+    transition: border 0.2s, background-color 0.2s;
+}
+
+.form-group input:focus {
+    border-color: #ff9800;
+    outline: none;
+    background-color: #444;
+}
+
+/* Botão */
+.button {
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #ff9800, #ffc107);
+    color: #222;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255,152,0,0.4);
+}
+
+.button:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* Listas */
+.gerenciar-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.gerenciar-card li {
+    background-color: #333;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Responsivo */
+@media (max-width: 600px) {
+    .grid-container {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .gerenciar-card {
+        padding: 1rem;
+    }
+
+    .gerenciar-container h1 {
+        font-size: 2rem;
+    }
+
+    .form-group input {
+        font-size: 1rem;
+    }
+}

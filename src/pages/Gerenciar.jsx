@@ -1,7 +1,7 @@
-// src/pages/Gerenciar.jsx
 import React, { useState, useEffect } from 'react';
 import { fetchClientes, createCliente, fetchTiposServicos, createTipoServico } from '../services/api';
 import Card from '../components/Card';
+import './Gerenciar.css';
 
 const Gerenciar = () => {
     const [clientes, setClientes] = useState([]);
@@ -50,15 +50,13 @@ const Gerenciar = () => {
     };
 
     return (
-        <div>
+        <div className="gerenciar-container">
             <h1>Gerenciar Cadastros</h1>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            {success && <p style={{ color: 'green' }}>{success}</p>}
+            {error && <p className="gerenciar-error">{error}</p>}
+            {success && <p className="gerenciar-success">{success}</p>}
 
             <div className="grid-container">
-                
-                
-                <Card>
+                <Card className="gerenciar-card">
                     <h3>Adicionar Novo Serviço</h3>
                     <form onSubmit={handleAddServico}>
                         <div className="form-group">
@@ -72,9 +70,15 @@ const Gerenciar = () => {
                         <button type="submit" className="button">Adicionar Serviço</button>
                     </form>
 
-                    <h4 style={{marginTop: '2rem'}}>Serviços Cadastrados</h4>
-                    <ul>{servicos.map(s => <li key={s.id}>{s.nome} - R$ {parseFloat(s.valor_padrao).toFixed(2)}</li>)}</ul>
+                    <h4>Serviços Cadastrados</h4>
+                    <ul>
+                        {servicos.map(s => (
+                            <li key={s.id}>{s.nome} - R$ {parseFloat(s.valor_padrao).toFixed(2)}</li>
+                        ))}
+                    </ul>
                 </Card>
+
+             
             </div>
         </div>
     );
