@@ -124,7 +124,7 @@ const [anoSelecionado, setAnoSelecionado] = useState(new Date().getFullYear());
             </span>
           </div>
           <div className="dashboard-error">
-            <h3>⚠️ Erro ao carregar dados</h3>
+            <h3>⚠️ Erro ao carregar dados, faça login para poder acessar</h3>
             <p>{error}</p>
             <button
               className="dashboard-retry-button"
