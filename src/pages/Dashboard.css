@@ -12,6 +12,81 @@
     align-items: center;
 }
 
+/* Container do PDF */
+.dashboard-pdf-container {
+  margin-top: 2rem;
+  padding: 1rem;
+  border: 1px solid #444;
+  border-radius: 12px;
+  background-color: #222;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Labels e selects */
+.dashboard-pdf-container label {
+  color: #fff;
+  font-size: 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.dashboard-pdf-container select {
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #666;
+  background-color: #333;
+  color: #fff;
+  font-size: 0.95rem;
+  transition: border 0.2s, background-color 0.2s;
+}
+
+.dashboard-pdf-container select:hover,
+.dashboard-pdf-container select:focus {
+  border-color: #ff9800;
+  background-color: #444;
+  outline: none;
+}
+
+/* Botão PDF */
+.dashboard-pdf-button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #ff9800, #ffc107);
+  color: #222;
+  font-weight: bold;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.dashboard-pdf-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+}
+
+.dashboard-pdf-button:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Responsivo para telas menores */
+@media (max-width: 600px) {
+  .dashboard-pdf-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dashboard-pdf-button {
+    width: 100%;
+  }
+}
+
+
 /* Header superior com o nome da barbearia */
 .dashboard-header {
     width: 100%;

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { FaCalendarDay, FaCalendarAlt, FaChartLine } from "react-icons/fa";
 import "./Dashboard.css";
 import { fetchHistorico } from "../services/api";
+import { gerarRelatorioGanhos } from "../services/api";
 
 const Dashboard = ({ token, usuario }) => {
   const [sumario, setSumario] = useState({
@@ -13,6 +14,9 @@ const Dashboard = ({ token, usuario }) => {
   const [vendasColaboradores, setVendasColaboradores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [mesSelecionado, setMesSelecionado] = useState(new Date().getMonth() + 1);
+const [anoSelecionado, setAnoSelecionado] = useState(new Date().getFullYear());
+
 
   const formatCurrency = (value) =>
     new Intl.NumberFormat("pt-BR", {
@@ -260,6 +264,51 @@ const Dashboard = ({ token, usuario }) => {
                 ))}
               </div>
             )}
+
+          {/* 📄 Botão para gerar PDF de ganhos */}
+          <div className="dashboard-pdf-container">
+            <label>
+              Mês:
+              <select
+                value={mesSelecionado}
+                onChange={(e) => setMesSelecionado(Number(e.target.value))}
+              >
+                {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              Ano:
+              <select
+                value={anoSelecionado}
+                onChange={(e) => setAnoSelecionado(Number(e.target.value))}
+              >
+                {Array.from(
+                  { length: 5 },
+                  (_, i) => new Date().getFullYear() - i
+                ).map((a) => (
+                  <option key={a} value={a}>
+                    {a}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <button
+              className="dashboard-pdf-button"
+              onClick={() =>
+                gerarRelatorioGanhos(mesSelecionado, anoSelecionado).catch(
+                  (err) => alert(err.message)
+                )
+              }
+            >
+              📄 Baixar Relatório de Ganhos (PDF)
+            </button>
+          </div>
         </section>
       </main>
     </div>
