@@ -82,13 +82,16 @@ const RegistrarVenda = ({ setCurrentPage }) => {
   };
 
   const handleSubmit = async () => {
+    // Evita cliques múltiplos
+    if (loading) return; // 👈 Bloqueia novas execuções
+
     setError("");
     setSuccess("");
-    setLoading(true); // 👈 Ativa o carregamento
+    setLoading(true);
 
     if (!nomeCliente || itens.length === 0) {
       setError("Digite o nome do cliente e adicione pelo menos um serviço.");
-      setLoading(false); // 👈 Desativa em caso de erro
+      setLoading(false);
       return;
     }
 
@@ -106,16 +109,16 @@ const RegistrarVenda = ({ setCurrentPage }) => {
       };
 
       await createVenda(vendaData);
+
       setSuccess(`Venda para "${cliente.nome}" registrada com sucesso!`);
       setNomeCliente("");
       setItens([]);
-
       console.log("venda finalizada ✅");
     } catch (err) {
-      console.log(err, "erro ao finalizar venda");
-      setError(err.message);
+      console.error(err);
+      setError(err.message || "Erro ao registrar a venda.");
     } finally {
-      setLoading(false); // 👈 Sempre desliga o carregando no final
+      setLoading(false);
     }
   };
 
@@ -198,7 +201,7 @@ const RegistrarVenda = ({ setCurrentPage }) => {
       <button
         className="rv-submit-button"
         onClick={handleSubmit}
-        disabled={!nomeCliente || itens.length === 0}
+        disabled={loading || !nomeCliente || itens.length === 0} // 👈 Impede clique repetido
       >
         {loading ? <span className="spinner"></span> : "Finalizar venda"}
       </button>
