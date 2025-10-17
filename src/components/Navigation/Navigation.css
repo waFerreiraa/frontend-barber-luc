@@ -62,6 +62,22 @@
   color: var(--text-color);
   cursor: pointer;
 }
+.sidebar ul li {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espaço entre ícone e texto */
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.sidebar ul li:hover {
+  background-color: #333;
+}
+
+.icon {
+  font-size: 18px;
+}
 
 
 /* --- Media Query para o Menu Lateral --- */
