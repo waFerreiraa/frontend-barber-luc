@@ -43,7 +43,7 @@ const Login = ({ onLogin }) => {
       } else {
         setErrors((prev) => ({
           ...prev,
-          geral: 'Erro ao tentar fazer login. Verique Email e Senha .'
+          geral: 'Erro ao tentar fazer login. Verique Email e .'
         }));
       }
     } finally {
@@ -89,7 +89,7 @@ const Login = ({ onLogin }) => {
               className="toggle-password"
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
+              {showPassword ? <FaEye /> : <FaEyeSlash/>}
             </button>
           </div>
           {errors.senha && <p className="error-message">{errors.senha}</p>}
