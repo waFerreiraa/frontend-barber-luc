@@ -1,4 +1,3 @@
-
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 // Pega token do localStorage
@@ -29,11 +28,22 @@ export const excluirVendaCliente = async (vendaId) => {
 };
 
 const handleResponse = async (response) => {
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || "Ocorreu um erro na requisição.");
+  let data;
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error("Erro inesperado no servidor. Resposta inválida.");
   }
-  return response.json();
+
+  if (!response.ok) {
+    const message =
+      data?.error || data?.message || "Ocorreu um erro na requisição.";
+    const error = new Error(message);
+    error.status = response.status;
+    throw error;
+  }
+
+  return data;
 };
 
 // SUMÁRIO
@@ -97,17 +107,35 @@ export const createVenda = async (venda) => {
 };
 
 // LOGIN
+// LOGIN
 export const loginUser = async (email, senha) => {
   const response = await fetch(`${BASE_URL}/api/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, senha }),
   });
+
+  // Faz o parse da resposta (ou lança erro se falhar)
   const data = await handleResponse(response);
-  // Salva token e dados do usuário
-  localStorage.setItem("token", data.token);
-  localStorage.setItem("user", JSON.stringify(data));
-  return data;
+
+  // Garante que os dados esperados existam
+  if (!data || !data.token) {
+    throw new Error("Resposta inválida do servidor. Token ausente.");
+  }
+
+  // Normaliza os dados do usuário
+  const usuario = {
+    id: data.id,
+    nome: data.nome,
+    tipo_usuario: data.tipo_usuario || data.tipo,
+    token: data.token,
+  };
+
+  // Salva localmente
+  localStorage.setItem("token", usuario.token);
+  localStorage.setItem("user", JSON.stringify(usuario));
+
+  return usuario;
 };
 
 export const gerarRelatorioGanhos = async (mes, ano) => {

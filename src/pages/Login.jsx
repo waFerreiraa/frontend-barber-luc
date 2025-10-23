@@ -1,49 +1,69 @@
-import React, { useState } from 'react';
-import { loginUser } from '../services/api';
-import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
-import './Login.css';
+import React, { useState } from "react";
+import { loginUser } from "../services/api";
+import {
+  FaEnvelope,
+  FaLock,
+  FaEye,
+  FaEyeSlash
+} from "react-icons/fa";
+import "./Login.css";
 
 const Login = ({ onLogin }) => {
-  const [form, setForm] = useState({ email: '', senha: '' });
-  const [errors, setErrors] = useState({ email: '', senha: '', geral: '' });
+  const [form, setForm] = useState({ email: "", senha: "" });
+  const [errors, setErrors] = useState({ email: "", senha: "", geral: "" });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  // Atualiza campos e limpa mensagens de erro ao digitar
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: '', geral: '' }); // limpa erro ao digitar
+    setErrors({ ...errors, [e.target.name]: "", geral: "" });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrors({ email: '', senha: '', geral: '' });
+    setErrors({ email: "", senha: "", geral: "" });
 
-    let hasError = false;
-
-    if (!form.email) {
-      setErrors((prev) => ({ ...prev, email: 'Email é obrigatório' }));
-      hasError = true;
+    // Validação simples
+    if (!form.email || !form.senha) {
+      setErrors({
+        email: !form.email ? "Email é obrigatório" : "",
+        senha: !form.senha ? "Senha é obrigatória" : "",
+      });
+      return;
     }
-    if (!form.senha) {
-      setErrors((prev) => ({ ...prev, senha: 'Senha é obrigatória' }));
-      hasError = true;
-    }
-    if (hasError) return;
 
     setLoading(true);
     try {
+      // Faz login via API
       const userData = await loginUser(form.email, form.senha);
-      onLogin(userData);
+
+      if (!userData || !userData.token) {
+        throw new Error("Resposta inválida do servidor");
+      }
+
+      // Armazena token e dados do usuário
+      localStorage.setItem("token", userData.token);
+      const usuario = {
+        id: userData.id,
+        nome: userData.nome,
+        tipo_usuario: userData.tipo_usuario || userData.tipo,
+      };
+      localStorage.setItem("user", JSON.stringify(usuario));
+
+      // Atualiza o estado global do App
+      onLogin(usuario);
+
     } catch (err) {
       if (err.response?.status === 401) {
         setErrors((prev) => ({
           ...prev,
-          geral: '⚠️ Email ou senha estão incorretos'
+          geral: "⚠️ Email ou senha incorretos.",
         }));
       } else {
         setErrors((prev) => ({
           ...prev,
-          geral: 'Erro ao tentar fazer login. Verique Email e .'
+          geral: "⚠️ Erro ao tentar fazer login. Verifique suas credenciais.",
         }));
       }
     } finally {
@@ -75,7 +95,7 @@ const Login = ({ onLogin }) => {
           <div className="password-wrapper">
             <FaLock className="input-icon" />
             <input
-              type={showPassword ? 'text' : 'password'}
+              type={showPassword ? "text" : "password"}
               name="senha"
               id="senha"
               placeholder="Digite sua senha"
@@ -89,14 +109,14 @@ const Login = ({ onLogin }) => {
               className="toggle-password"
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? <FaEye /> : <FaEyeSlash/>}
+              {showPassword ? <FaEye /> : <FaEyeSlash />}
             </button>
           </div>
           {errors.senha && <p className="error-message">{errors.senha}</p>}
         </div>
 
         <button type="submit" disabled={loading}>
-          {loading ? 'Entrando...' : 'Entrar'}
+          {loading ? "Entrando..." : "Entrar"}
         </button>
 
         {errors.geral && <p className="error-message">{errors.geral}</p>}
