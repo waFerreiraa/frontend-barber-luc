@@ -1,30 +1,28 @@
-import React from 'react';
+import React from "react";
 import {
   FaTachometerAlt,
   FaCashRegister,
   FaHistory,
   FaUsers,
   FaSignOutAlt,
-} from 'react-icons/fa';
-import './Navigation.css';
-import { logoutUser } from '../../services/api'; // 🔥 usa a função centralizada de logout
+} from "react-icons/fa";
+import "./Navigation.css";
+import { logoutUser } from "../../services/api";
 
 const Navigation = ({ setCurrentPage, isNavOpen, setIsNavOpen, setUser }) => {
-
   const handleNavClick = (page) => {
     setCurrentPage(page);
-    setIsNavOpen(false); // fecha o menu ao clicar
+    setIsNavOpen(false);
   };
 
   const handleLogout = () => {
-    // 🔒 usa função global para limpar token e user
-    logoutUser();
-    setUser(null);
+    logoutUser(); // limpa token e user
+    setUser(null); // redireciona para Login
     setIsNavOpen(false);
   };
 
   return (
-    <nav className={`sidebar ${isNavOpen ? 'open' : ''}`}>
+    <nav className={`sidebar ${isNavOpen ? "open" : ""}`}>
       <div className="sidebar-header">
         <h2>Barbearia</h2>
         <span>Painel</span>
@@ -38,17 +36,17 @@ const Navigation = ({ setCurrentPage, isNavOpen, setIsNavOpen, setUser }) => {
       </div>
 
       <ul>
-        <li onClick={() => handleNavClick('dashboard')}>
+        <li onClick={() => handleNavClick("dashboard")}>
           <FaTachometerAlt className="icon" /> Dashboard
         </li>
-        <li onClick={() => handleNavClick('registrarVenda')}>
+        <li onClick={() => handleNavClick("registrarVenda")}>
           <FaCashRegister className="icon" /> Registrar Venda
         </li>
-        <li onClick={() => handleNavClick('historico')}>
+        <li onClick={() => handleNavClick("historico")}>
           <FaHistory className="icon" /> Histórico
         </li>
-        <li onClick={() => handleNavClick('gerenciar')}>
-          <FaUsers className="icon" /> Gerenciar
+        <li onClick={() => handleNavClick("gerenciar")}>
+          <FaUsers className="icon" /> Serviços
         </li>
         <li onClick={handleLogout} className="logout-button">
           <FaSignOutAlt className="icon" /> Sair

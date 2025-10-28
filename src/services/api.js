@@ -1,32 +1,20 @@
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
+// --- LOGOUT GLOBAL AUTOMÁTICO ---
+let globalLogout = null;
+
+// Permite registrar a função de logout do App.jsx
+export const registerLogoutHandler = (fn) => {
+  globalLogout = fn;
+};
+
 // Pega token do localStorage
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-// services/api.js
-export const excluirVendaCliente = async (vendaId) => {
-  const response = await fetch(
-    `${BASE_URL}/api/vendas/${vendaId}/excluir-cliente`,
-    {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeaders(),
-      },
-    }
-  );
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || "Erro ao excluir venda/cliente");
-  }
-
-  return response.json();
-};
-
+// --- HANDLE RESPONSE CENTRALIZADO ---
 const handleResponse = async (response) => {
   let data;
   try {
@@ -36,6 +24,11 @@ const handleResponse = async (response) => {
   }
 
   if (!response.ok) {
+    // Se 401, chama logout global
+    if (response.status === 401 && globalLogout) {
+      globalLogout();
+    }
+
     const message =
       data?.error || data?.message || "Ocorreu um erro na requisição.";
     const error = new Error(message);
@@ -46,7 +39,7 @@ const handleResponse = async (response) => {
   return data;
 };
 
-// SUMÁRIO
+// --- SUMÁRIO ---
 export const fetchSumario = async () => {
   const response = await fetch(`${BASE_URL}/api/sumario`, {
     headers: { ...getAuthHeaders() },
@@ -54,7 +47,7 @@ export const fetchSumario = async () => {
   return handleResponse(response);
 };
 
-// CLIENTES
+// --- CLIENTES ---
 export const fetchClientes = async () => {
   const response = await fetch(`${BASE_URL}/api/clientes`, {
     headers: { ...getAuthHeaders() },
@@ -71,7 +64,7 @@ export const createCliente = async (cliente) => {
   return handleResponse(response);
 };
 
-// TIPOS DE SERVIÇOS
+// --- TIPOS DE SERVIÇOS ---
 export const fetchTiposServicos = async () => {
   const response = await fetch(`${BASE_URL}/api/tipos_servicos`, {
     headers: { ...getAuthHeaders() },
@@ -88,7 +81,7 @@ export const createTipoServico = async (servico) => {
   return handleResponse(response);
 };
 
-// HISTÓRICO
+// --- HISTÓRICO ---
 export const fetchHistorico = async () => {
   const response = await fetch(`${BASE_URL}/api/historico`, {
     headers: { ...getAuthHeaders() },
@@ -96,7 +89,7 @@ export const fetchHistorico = async () => {
   return handleResponse(response);
 };
 
-// VENDAS
+// --- VENDAS ---
 export const createVenda = async (venda) => {
   const response = await fetch(`${BASE_URL}/api/vendas`, {
     method: "POST",
@@ -106,8 +99,21 @@ export const createVenda = async (venda) => {
   return handleResponse(response);
 };
 
-// LOGIN
-// LOGIN
+export const excluirVendaCliente = async (vendaId) => {
+  const response = await fetch(
+    `${BASE_URL}/api/vendas/${vendaId}/excluir-cliente`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeaders(),
+      },
+    }
+  );
+  return handleResponse(response);
+};
+
+// --- LOGIN ---
 export const loginUser = async (email, senha) => {
   const response = await fetch(`${BASE_URL}/api/login`, {
     method: "POST",
@@ -115,15 +121,12 @@ export const loginUser = async (email, senha) => {
     body: JSON.stringify({ email, senha }),
   });
 
-  // Faz o parse da resposta (ou lança erro se falhar)
   const data = await handleResponse(response);
 
-  // Garante que os dados esperados existam
   if (!data || !data.token) {
     throw new Error("Resposta inválida do servidor. Token ausente.");
   }
 
-  // Normaliza os dados do usuário
   const usuario = {
     id: data.id,
     nome: data.nome,
@@ -131,19 +134,18 @@ export const loginUser = async (email, senha) => {
     token: data.token,
   };
 
-  // Salva localmente
   localStorage.setItem("token", usuario.token);
   localStorage.setItem("user", JSON.stringify(usuario));
 
   return usuario;
 };
 
+// --- RELATÓRIO EM PDF ---
 export const gerarRelatorioGanhos = async (mes, ano) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("Usuário não autenticado");
 
   const url = `${BASE_URL}/api/relatorio-ganhos?mes=${mes}&ano=${ano}`;
-
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -160,7 +162,7 @@ export const gerarRelatorioGanhos = async (mes, ano) => {
   link.click();
 };
 
-// LOGOUT
+// --- LOGOUT ---
 export const logoutUser = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("user");

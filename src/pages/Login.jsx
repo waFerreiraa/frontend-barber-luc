@@ -1,11 +1,6 @@
 import React, { useState } from "react";
 import { loginUser } from "../services/api";
-import {
-  FaEnvelope,
-  FaLock,
-  FaEye,
-  FaEyeSlash
-} from "react-icons/fa";
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import "./Login.css";
 
 const Login = ({ onLogin }) => {
@@ -14,7 +9,6 @@ const Login = ({ onLogin }) => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Atualiza campos e limpa mensagens de erro ao digitar
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setErrors({ ...errors, [e.target.name]: "", geral: "" });
@@ -24,7 +18,6 @@ const Login = ({ onLogin }) => {
     e.preventDefault();
     setErrors({ email: "", senha: "", geral: "" });
 
-    // Validação simples
     if (!form.email || !form.senha) {
       setErrors({
         email: !form.email ? "Email é obrigatório" : "",
@@ -35,37 +28,16 @@ const Login = ({ onLogin }) => {
 
     setLoading(true);
     try {
-      // Faz login via API
-      const userData = await loginUser(form.email, form.senha);
-
-      if (!userData || !userData.token) {
-        throw new Error("Resposta inválida do servidor");
-      }
-
-      // Armazena token e dados do usuário
-      localStorage.setItem("token", userData.token);
-      const usuario = {
-        id: userData.id,
-        nome: userData.nome,
-        tipo_usuario: userData.tipo_usuario || userData.tipo,
-      };
-      localStorage.setItem("user", JSON.stringify(usuario));
-
-      // Atualiza o estado global do App
+      const usuario = await loginUser(form.email, form.senha);
       onLogin(usuario);
-
     } catch (err) {
-      if (err.response?.status === 401) {
-        setErrors((prev) => ({
-          ...prev,
-          geral: "⚠️ Email ou senha incorretos.",
-        }));
-      } else {
-        setErrors((prev) => ({
-          ...prev,
-          geral: "⚠️ Erro ao tentar fazer login. Verifique suas credenciais.",
-        }));
-      }
+      setErrors((prev) => ({
+        ...prev,
+        geral:
+          err.status === 401
+            ? "⚠️ Email ou senha incorretos."
+            : "⚠️ Erro ao tentar fazer login. Verifique suas credenciais.",
+      }));
     } finally {
       setLoading(false);
     }
@@ -81,7 +53,6 @@ const Login = ({ onLogin }) => {
           <input
             type="email"
             name="email"
-            id="email"
             placeholder="Digite seu email"
             value={form.email}
             onChange={handleChange}
@@ -97,7 +68,6 @@ const Login = ({ onLogin }) => {
             <input
               type={showPassword ? "text" : "password"}
               name="senha"
-              id="senha"
               placeholder="Digite sua senha"
               value={form.senha}
               onChange={handleChange}
