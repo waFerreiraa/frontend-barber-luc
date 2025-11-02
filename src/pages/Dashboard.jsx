@@ -26,50 +26,57 @@ const Dashboard = ({ token, usuario }) => {
       currency: "BRL",
     }).format(value);
 
-  useEffect(() => {
-    const getDashboardData = async () => {
-      try {
-        setLoading(true);
-        setError("");
+ useEffect(() => {
+  const getDashboardData = async () => {
+    try {
+      setLoading(true);
+      setError("");
 
-        const dataHistorico = await fetchHistorico(token);
+      const dataHistorico = await fetchHistorico(token);
 
-        const minhasVendas = dataHistorico.filter(
-          (v) => v.usuario_id === usuario.id
+      const minhasVendas = dataHistorico.filter(
+        (v) => v.usuario_id === usuario.id
+      );
+
+      const hoje = new Date();
+      const mes = hoje.getMonth();
+      const ano = hoje.getFullYear();
+
+      // 🔹 filtra apenas vendas do mês e ano atuais dos colaboradores
+      const colaboradorVendas = dataHistorico.filter((v) => {
+        const dataVenda = new Date(v.data_venda);
+        return (
+          v.usuario_id !== usuario.id &&
+          dataVenda.getMonth() === mes &&
+          dataVenda.getFullYear() === ano
         );
-        const colaboradorVendas = dataHistorico.filter(
-          (v) => v.usuario_id !== usuario.id
-        );
+      });
 
-        const hoje = new Date();
+      const faturamentoDia = minhasVendas
+        .filter(
+          (v) => new Date(v.data_venda).toDateString() === hoje.toDateString()
+        )
+        .reduce((acc, v) => acc + Number(v.valor_total || 0), 0);
 
-        const faturamentoDia = minhasVendas
-          .filter(
-            (v) => new Date(v.data_venda).toDateString() === hoje.toDateString()
-          )
-          .reduce((acc, v) => acc + Number(v.valor_total || 0), 0);
+      const faturamentoMes = minhasVendas
+        .filter((v) => {
+          const data = new Date(v.data_venda);
+          return data.getMonth() === mes && data.getFullYear() === ano;
+        })
+        .reduce((acc, v) => acc + Number(v.valor_total || 0), 0);
 
-        const mes = hoje.getMonth();
-        const ano = hoje.getFullYear();
+      setSumario({ faturamentoDia, faturamentoMes });
+      setVendasColaboradores(colaboradorVendas);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        const faturamentoMes = minhasVendas
-          .filter((v) => {
-            const data = new Date(v.data_venda);
-            return data.getMonth() === mes && data.getFullYear() === ano;
-          })
-          .reduce((acc, v) => acc + Number(v.valor_total || 0), 0);
+  getDashboardData();
+}, [token, usuario]);
 
-        setSumario({ faturamentoDia, faturamentoMes });
-        setVendasColaboradores(colaboradorVendas);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getDashboardData();
-  }, [token, usuario]);
 
   const renderCards = () => (
     <div className="dashboard-cards-grid">
