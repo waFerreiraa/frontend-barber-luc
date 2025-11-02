@@ -72,25 +72,6 @@ export const fetchTiposServicos = async () => {
   return handleResponse(response);
 };
 
-// Atualizar serviço
-export const updateTipoServico = async (id, data) => {
-  const res = await fetch(`${API_URL}/tipos-servicos/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) throw new Error("Erro ao atualizar serviço");
-  return await res.json();
-};
-
-// Apagar serviço
-export const deleteTipoServico = async (id) => {
-  const res = await fetch(`${API_URL}/tipos-servicos/${id}`, { method: "DELETE" });
-  if (!res.ok) throw new Error("Erro ao apagar serviço");
-  return true;
-};
-
-
 export const createTipoServico = async (servico) => {
   const response = await fetch(`${BASE_URL}/api/tipos_servicos`, {
     method: "POST",
