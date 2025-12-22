@@ -93,9 +93,6 @@ const Dashboard = ({ token, usuario }) => {
         <div className="dashboard-card-value">
           {formatCurrency(sumario.faturamentoDia)}
         </div>
-        <div className="dashboard-card-footer">
-          <small>📅 Hoje</small>
-        </div>
       </div>
 
       <div className="dashboard-card dashboard-card-month">

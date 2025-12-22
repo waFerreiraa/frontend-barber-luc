@@ -39,6 +39,14 @@ const Historico = ({ token, usuario }) => {
     });
   };
 
+  const formatHora = (data) => {
+    return new Date(data).toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "America/Sao_Paulo",
+    });
+  };
+
   // Função para abrir modal
   const abrirModalExclusao = (venda) => {
     setVendaParaExcluir(venda);
@@ -157,13 +165,12 @@ const Historico = ({ token, usuario }) => {
                                   <ul>
                                     {vendasDoColab.map((venda) => (
                                       <li key={venda.id}>
-                                        🧑‍🤝‍🧑{" "}
+                                        🕒 {formatHora(venda.data_venda)} —{" "}
                                         {venda.cliente_nome ||
                                           "Cliente não informado"}{" "}
                                         —{" "}
                                         {formatCurrency(venda.valor_total || 0)}{" "}
-                                        — 📦 {venda.venda_itens?.length || 0}{" "}
-                                        itens
+                                        
                                         <button
                                           className="rv-delete-button"
                                           onClick={() =>
