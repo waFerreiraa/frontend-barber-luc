@@ -1,4 +1,5 @@
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+// src/services/api.js
+const BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:10000";
 
 // --- LOGOUT GLOBAL AUTOMÁTICO ---
 let globalLogout = null;
@@ -16,11 +17,26 @@ const getAuthHeaders = () => {
 
 // --- HANDLE RESPONSE CENTRALIZADO ---
 const handleResponse = async (response) => {
-  let data;
+  const contentType = response.headers.get("content-type") || "";
+
+  // Se for PDF, retorna blob
+  if (contentType.includes("application/pdf")) {
+    if (!response.ok) {
+      throw new Error("Erro ao gerar PDF");
+    }
+    return response.blob();
+  }
+
+  let data = null;
   try {
     data = await response.json();
   } catch {
-    throw new Error("Erro inesperado no servidor. Resposta inválida.");
+    // Se não for JSON e deu erro
+    if (!response.ok) {
+      throw new Error("Erro inesperado no servidor. Resposta inválida.");
+    }
+    // se não for JSON mas ok (ex: 204 No Content), retorna null
+    return null;
   }
 
   if (!response.ok) {
@@ -99,16 +115,36 @@ export const createVenda = async (venda) => {
   return handleResponse(response);
 };
 
+/**
+ * Excluir venda (rota RESTful recomendada)
+ * DELETE /api/vendas/:id
+ *
+ * Retorna:
+ *  - null se backend responder 204 No Content
+ *  - { message: '...' } ou similar se backend retornar JSON
+ */
 export const excluirVendaCliente = async (vendaId) => {
+  const response = await fetch(`${BASE_URL}/api/vendas/${vendaId}`, {
+    method: "DELETE",
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
+  return handleResponse(response);
+};
+
+/**
+ * Compatibilidade temporária: se você preferir não alterar o backend agora,
+ * chame a rota antiga "/api/vendas/:id/excluir-cliente".
+ * (use só enquanto não atualizar o server)
+ */
+export const excluirVendaClienteLegacy = async (vendaId) => {
   const response = await fetch(
     `${BASE_URL}/api/vendas/${vendaId}/excluir-cliente`,
     {
       method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeaders(),
-      },
-    }
+      headers: { ...getAuthHeaders() },
+    },
   );
   return handleResponse(response);
 };
@@ -123,14 +159,15 @@ export const loginUser = async (email, senha) => {
 
   const data = await handleResponse(response);
 
-  if (!data || !data.token) {
+  if (!data?.token) {
     throw new Error("Resposta inválida do servidor. Token ausente.");
   }
 
   const usuario = {
     id: data.id,
     nome: data.nome,
-    tipo_usuario: data.tipo_usuario || data.tipo,
+    tipo_usuario: data.tipo_usuario,
+    empresa_id: data.empresa_id, // ✅ útil pro front (UI/debug)
     token: data.token,
   };
 
@@ -145,14 +182,19 @@ export const gerarRelatorioGanhos = async (mes, ano) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("Usuário não autenticado");
 
-  const url = `${BASE_URL}/api/relatorio-ganhos?mes=${mes}&ano=${ano}`;
+  const url = `${BASE_URL}/api/relatorio/ganhos?mes=${mes}&ano=${ano}`;
+
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || "Erro ao gerar PDF");
+    let msg = "Erro ao gerar PDF";
+    try {
+      const errorData = await response.json();
+      msg = errorData?.error || msg;
+    } catch {}
+    throw new Error(msg);
   }
 
   const blob = await response.blob();
