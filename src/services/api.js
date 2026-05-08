@@ -115,6 +115,25 @@ export const createVenda = async (venda) => {
   return handleResponse(response);
 };
 
+// NOVO: Atualizar Tipo de Serviço
+export const updateTipoServico = async (id, servicoData) => {
+  const response = await fetch(`${BASE_URL}/api/tipos_servicos/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+    body: JSON.stringify(servicoData),
+  });
+  return handleResponse(response);
+};
+
+// NOVO: Excluir Tipo de Serviço
+export const deleteTipoServico = async (id) => {
+  const response = await fetch(`${BASE_URL}/api/tipos_servicos/${id}`, {
+    method: "DELETE",
+    headers: { ...getAuthHeaders() },
+  });
+  return handleResponse(response);
+};
+
 /**
  * Excluir venda (rota RESTful recomendada)
  * DELETE /api/vendas/:id

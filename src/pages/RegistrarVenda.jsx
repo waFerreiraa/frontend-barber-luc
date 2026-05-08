@@ -22,6 +22,7 @@ const RegistrarVenda = ({ setCurrentPage }) => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [abaAtiva, setAbaAtiva] = useState("cortes");
+  const [formaPagamento, setFormaPagamento] = useState(""); // Novo estado para a forma de pagamento
   const [loading, setLoading] = useState(false);
 
   const loadData = async () => {
@@ -37,6 +38,7 @@ const RegistrarVenda = ({ setCurrentPage }) => {
 
   useEffect(() => {
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -88,7 +90,7 @@ const RegistrarVenda = ({ setCurrentPage }) => {
     setError("");
     setSuccess("");
     setLoading(true);
-
+    // Remove formaPagamento da validação obrigatória
     if (!nomeCliente || itens.length === 0) {
       setError("Digite o nome do cliente e adicione pelo menos um serviço.");
       setLoading(false);
@@ -106,6 +108,7 @@ const RegistrarVenda = ({ setCurrentPage }) => {
           servico_id: item.servico_id,
           valor_cobrado: item.valor_em_centavos / 100,
         })),
+        forma_pagamento: formaPagamento, // Incluindo a forma de pagamento
       };
 
       await createVenda(vendaData);
@@ -113,6 +116,7 @@ const RegistrarVenda = ({ setCurrentPage }) => {
       setSuccess(`Venda para "${cliente.nome}" registrada com sucesso!`);
       setNomeCliente("");
       setItens([]);
+      setFormaPagamento(""); // Limpa a forma de pagamento após o sucesso
       console.log("venda finalizada ✅");
     } catch (err) {
       console.error(err);
@@ -151,7 +155,7 @@ const RegistrarVenda = ({ setCurrentPage }) => {
             <div
               key={servico.id}
               className="rv-service-item"
-              onClick={() => handleAddServico(servico)}
+              onClick={() => handleAddServico(servico)} // Clicar no item adiciona o serviço
             >
               <div className="rv-service-left">
                 <div className="rv-service-icon">
@@ -198,10 +202,28 @@ const RegistrarVenda = ({ setCurrentPage }) => {
         </ul>
       </section>
 
+      {/* Campo para a Forma de Pagamento */}
+      <section className="rv-payment-method-section">
+        <h3>Forma de Pagamento</h3>
+        <div className="form-group">
+          <select
+            id="formaPagamento"
+            value={formaPagamento}
+            onChange={(e) => setFormaPagamento(e.target.value)}
+            // Removido o atributo 'required' para tornar opcional
+          >
+            <option value="">Selecione...</option>
+            <option value="Pix">Pix</option>
+            <option value="Dinheiro">Dinheiro</option>
+            <option value="Cartao de Credito">Cartão de Crédito</option>
+            <option value="Cartao de Debito">Cartão de Débito</option>
+          </select>
+        </div>
+      </section>
       <button
         className="rv-submit-button"
         onClick={handleSubmit}
-        disabled={loading || !nomeCliente || itens.length === 0} // 👈 Impede clique repetido
+        disabled={loading || !nomeCliente || itens.length === 0} // Remove !formaPagamento do disabled
       >
         {loading ? <span className="spinner"></span> : "Finalizar venda"}
       </button>

@@ -113,11 +113,30 @@
 }
 
 /* Inputs e seções */
-.rv-client-section h3, .rv-services-section h3, .rv-itens-adicionados h3 {
+.rv-client-section h3,
+.rv-services-section h3,
+.rv-itens-adicionados h3,
+.rv-payment-method-section h3 { /* Adicionado o seletor para o h3 da forma de pagamento */
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 0.5rem;
-    color: #333;
+    color: #000000; /* Alterado para preto para maior visibilidade */
+}
+
+.rv-payment-method-section .form-group select {
+    width: 100%;
+    padding: 1.2rem; /* Ajustado para combinar com rv-client-input */
+    font-size: 1.1rem;
+    border-radius: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    color: #000000; /* Garante que o texto dentro do select seja preto */
+    background-color: #ffffff; /* Fundo branco para o select */
+}
+
+.rv-payment-method-section .form-group select:focus {
+    outline: none;
+    border-color: #1a1a1a;
 }
 
 .rv-client-input {

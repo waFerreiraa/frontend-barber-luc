@@ -1,0 +1,40 @@
+/* DeleteConfirmationModal.css */
+
+/* Reutiliza o backdrop e modal-content do EditServicoModal.css */
+/* Certifique-se de que EditServicoModal.css está sendo importado globalmente ou antes deste */
+
+.delete-modal-content {
+    /* Ajustes específicos para o modal de exclusão, se necessário */
+    max-width: 400px; /* Pode ser um pouco menor que o de edição */
+    text-align: center;
+}
+
+.delete-modal-content h2 {
+    color: #dc3545; /* Vermelho para o título de exclusão */
+}
+
+.delete-modal-content p {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    color: #ccc;
+}
+
+.delete-modal-content .warning-text {
+    color: #ffc107; /* Amarelo para o aviso de irreversível */
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-top: -0.5rem; /* Ajusta o espaçamento */
+}
+
+.modal-actions {
+    justify-content: center; /* Centraliza os botões */
+    margin-top: 1.5rem;
+}
+
+.modal-delete-button {
+    background: linear-gradient(90deg, #dc3545, #c82333); /* Vermelho para o botão de exclusão */
+}
+
+.modal-delete-button:hover {
+    background: linear-gradient(90deg, #c82333, #bd2130);
+}
