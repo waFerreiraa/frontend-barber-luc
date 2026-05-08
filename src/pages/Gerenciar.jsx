@@ -7,8 +7,8 @@ import {
     updateTipoServico, // Importar nova função
     deleteTipoServico, // Importar nova função
 } from '../services/api';
-import EditServicoModal from '../Pages/EditServicoModal'; // Importar o novo modal
-import DeleteConfirmationModal from '../Pages/DeleteConfirmationModal'; // Importar o novo modal
+import EditServicoModal from '../pages/EditServicoModal'; // Importar o novo modal
+import DeleteConfirmationModal from '../pages/DeleteConfirmationModal'; // Importar o novo modal
 import Card from '../components/Card';
 import { FaEdit, FaTrash } from 'react-icons/fa'; // Importar ícones
 import './Gerenciar.css';
