@@ -3,7 +3,7 @@ import './EditServicoModal.css'; // Importa o CSS para o modal
 
 const EditServicoModal = ({ servico, onSave, onCancel, loading }) => {
     const [nome, setNome] = useState('');
-    const [valorPadrao, setValorPadrao] = useState('');
+    const [valorPadrao, setValorPadrao] = useState('');// Adicionar estado para duração
 
     useEffect(() => {
         if (servico) {
@@ -13,7 +13,8 @@ const EditServicoModal = ({ servico, onSave, onCancel, loading }) => {
         }
     }, [servico]);
 
-    const handleSave = () => {
+    const handleSave = (e) => {
+        e.preventDefault(); // Previne o comportamento padrão do formulário
         // Validação básica antes de salvar
         if (!nome.trim()) {
             alert('O nome do serviço não pode ser vazio.');
@@ -24,15 +25,18 @@ const EditServicoModal = ({ servico, onSave, onCancel, loading }) => {
             alert('O valor padrão deve ser um número positivo.');
             return;
         }
-        onSave(servico.id, nome, valorNumerico);
+        onSave({
+            id: servico.id,
+            nome: nome,
+            valor_padrao: valorNumerico
+        });
     };
 
     if (!servico) return null; // Não renderiza se não houver serviço para editar
-
     return (
         <div className="modal-backdrop">
             <div className="modal-content">
-                <h2>Editar Serviço</h2>
+                <h2>Editar Serviço</h2> {/* Adicionado o form para o handleSubmit */}
                 <div className="form-group">
                     <label htmlFor="editNomeServico">Nome do Serviço:</label>
                     <input
@@ -54,6 +58,7 @@ const EditServicoModal = ({ servico, onSave, onCancel, loading }) => {
                         disabled={loading}
                     />
                 </div>
+            
                 <div className="modal-actions">
                     <button
                         className="button modal-cancel-button"
@@ -64,7 +69,7 @@ const EditServicoModal = ({ servico, onSave, onCancel, loading }) => {
                     </button>
                     <button
                         className="button modal-save-button"
-                        onClick={handleSave}
+                        onClick={handleSave} // Alterado para usar o handleSubmit do form
                         disabled={loading}
                     >
                         {loading ? 'Salvando...' : 'Salvar'}

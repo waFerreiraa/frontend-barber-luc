@@ -38,3 +38,15 @@
 .modal-delete-button:hover {
     background: linear-gradient(90deg, #c82333, #bd2130);
 }
+
+/* Responsividade para o modal de exclusão */
+@media (max-width: 600px) {
+    .delete-modal-content {
+        padding: 1.5rem; /* Reduz o padding em telas menores */
+    }
+
+    .modal-actions {
+        flex-direction: column; /* Empilha os botões verticalmente */
+        gap: 0.75rem; /* Espaçamento entre os botões */
+    }
+}

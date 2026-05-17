@@ -168,6 +168,47 @@ export const excluirVendaClienteLegacy = async (vendaId) => {
   return handleResponse(response);
 };
 
+// --- AGENDAMENTOS ---
+export const fetchAgendamentos = async (filters = {}) => {
+  const query = new URLSearchParams(filters).toString();
+  const response = await fetch(`${BASE_URL}/api/agendamentos?${query}`, {
+    headers: { ...getAuthHeaders() },
+  });
+  return handleResponse(response);
+};
+
+export const createAgendamento = async (agendamentoData) => {
+  const response = await fetch(`${BASE_URL}/api/agendamentos`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+    body: JSON.stringify(agendamentoData),
+  });
+  return handleResponse(response);
+};
+
+export const updateAgendamento = async (id, agendamentoData) => {
+  const response = await fetch(`${BASE_URL}/api/agendamentos/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+    body: JSON.stringify(agendamentoData),
+  });
+  return handleResponse(response);
+};
+
+export const deleteAgendamento = async (id) => {
+  const response = await fetch(`${BASE_URL}/api/agendamentos/${id}`, {
+    method: "DELETE",
+    headers: { ...getAuthHeaders() },
+  });
+  return handleResponse(response);
+};
+
+// --- COLABORADORES (BARBEIROS) ---
+export const fetchColaboradores = async () => {
+  const response = await fetch(`${BASE_URL}/api/colaboradores`, { headers: { ...getAuthHeaders() } });
+  return handleResponse(response);
+};
+
 // --- LOGIN ---
 export const loginUser = async (email, senha) => {
   const response = await fetch(`${BASE_URL}/api/login`, {

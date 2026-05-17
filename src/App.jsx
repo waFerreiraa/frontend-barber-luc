@@ -4,6 +4,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import RegistrarVenda from "./pages/RegistrarVenda.jsx";
 import Historico from "./pages/Historico.jsx";
 import Gerenciar from "./pages/Gerenciar.jsx";
+import Agenda from "./pages/Agenda.jsx"; // Importar o novo componente Agenda
 import Login from "./pages/Login.jsx";
 import { registerLogoutHandler } from "./services/api";
 
@@ -57,6 +58,8 @@ function App() {
         return <Historico />;
       case "gerenciar":
         return <Gerenciar />;
+      case "agenda": // NOVO: Adicionar case para a página de Agenda
+        return <Agenda usuario={user} />; // Passa o usuário para a Agenda, se necessário
       default:
         return <Dashboard usuario={user} />;
     }
