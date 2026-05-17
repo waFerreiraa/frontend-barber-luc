@@ -356,7 +356,7 @@
     font-size: 1.8rem;
     font-weight: 700;
     cursor: pointer;
-    padding-bottom: 50px;
+    /* padding-bottom: 50px; - Considerar se este padding é intencional e como ele afeta o layout */
     transition: background-color 0.2s;
 }
 
@@ -461,7 +461,7 @@
     width: 100%;
     padding: 1.4rem;
     font-size: 1.3rem;
-    border-radius: 14px;
+    border-radius: 12px; /* Manter consistência com desktop */
     margin-top: 2rem;
     min-height: 60px;
     touch-action: manipulation;

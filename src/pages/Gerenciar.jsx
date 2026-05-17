@@ -88,16 +88,13 @@ const Gerenciar = () => {
     };
 
     // Função para salvar as edições do modal
-    const handleSaveEditedServico = async (servicoId, novoNome, novoValor) => {
+    const handleSaveEditedServico = async (servicoData) => { // Aceita um objeto servicoData
         setError("");
         setSuccess("");
 
         try {
             setLoading(true);
-            await updateTipoServico(servicoId, {
-                nome: novoNome,
-                valor_padrao: novoValor,
-            });
+            await updateTipoServico(servicoData.id, servicoData); // Passa o objeto completo
             setSuccess("Serviço atualizado com sucesso!");
             loadData(); // Recarrega a lista de serviços
         } catch (err) {

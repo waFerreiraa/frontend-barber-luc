@@ -1,7 +1,7 @@
 /* Gerenciar.css */
 
 /* Container principal */
-.gerenciar-container {
+.gerenciar-container { /* Adicionado padding-bottom para evitar que o conteúdo fique muito próximo da borda inferior em mobile */
     width: 100%;
     min-height: 100vh;
     background-color: #1a1a1a;
@@ -11,6 +11,7 @@
     flex-direction: column;
     align-items: center;
     color: #fff;
+    padding-bottom: 4rem; /* Adicionado para melhor espaçamento em mobile */
 }
 
 /* Título da página */

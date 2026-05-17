@@ -3,13 +3,14 @@ import {
   FaTachometerAlt,
   FaCashRegister,
   FaHistory,
-  FaUsers,
+  FaUsers, // Mantém FaUsers para "Serviços"
   FaSignOutAlt,
 } from "react-icons/fa";
+import { FaCalendarAlt } from "react-icons/fa"; // Importar ícone de calendário
 import "./Navigation.css";
-import { logoutUser } from "../../services/api";
+import { logoutUser } from "../../services/api"; // Certifique-se de que esta importação está correta
 
-const Navigation = ({ setCurrentPage, isNavOpen, setIsNavOpen, setUser }) => {
+const Navigation = ({ currentPage, setCurrentPage, isNavOpen, setIsNavOpen, setUser }) => {
   const handleNavClick = (page) => {
     setCurrentPage(page);
     setIsNavOpen(false);
@@ -47,6 +48,13 @@ const Navigation = ({ setCurrentPage, isNavOpen, setIsNavOpen, setUser }) => {
         </li>
         <li onClick={() => handleNavClick("gerenciar")}>
           <FaUsers className="icon" /> Serviços
+        </li>
+        {/* NOVO: Link para a Agenda */}
+        <li
+          onClick={() => handleNavClick("agenda")}
+          className={currentPage === "agenda" ? "active" : ""}
+        >
+          <FaCalendarAlt className="icon" /> Agenda
         </li>
         <li onClick={handleLogout} className="logout-button">
           <FaSignOutAlt className="icon" /> Sair

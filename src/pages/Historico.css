@@ -1,6 +1,7 @@
 /* --- Histórico: itens maiores e mais legíveis --- */
 .rv-historico-item {
   background-color: #e9e9e9;
+  /* Aumentar padding para melhor toque */
   padding: 1.4rem 1rem;
   border-radius: 12px;
   margin-bottom: 1rem;
@@ -64,6 +65,7 @@
   border: none;
   color: white;
   padding: 6px 12px;
+  min-width: 80px; /* Garante tamanho mínimo para toque */
   margin-left: 10px;
   border-radius: 6px;
   cursor: pointer;
@@ -166,6 +168,7 @@
   .rv-delete-button {
     padding: 8px 14px;
     font-size: 0.95rem;
+    min-width: unset; /* Remove min-width para mobile se não for necessário */
     margin-top: 5px;
   }
 
