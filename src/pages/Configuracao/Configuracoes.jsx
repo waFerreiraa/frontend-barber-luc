@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { toast } from 'react-toastify';
 import Card from '../../components/Card';
 import { alterarMinhaSenha, alterarMeuEmail } from '../../services/api.js'; 
-import '../Gerenciar/gerenciar.css'; // Reutilizando estilos do Gerenciar para consistência
+import '../Gerenciar/Gerenciar.css'; // Reutilizando estilos do Gerenciar para consistência
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 import { ThemeContext } from "../../contexts/ThemeContext";
