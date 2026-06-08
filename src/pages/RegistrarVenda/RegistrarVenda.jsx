@@ -1,26 +1,32 @@
 // src/pages/RegistrarVenda.jsx
 
-import Logo from "../assets/penteado.png";
-import Lucao from "../assets/LucaoLogo.png";
-import React, { useState, useEffect } from "react";
+import Logo from "../../assets/penteado.png";
+import Cabelo from "../../assets/mulher.png";
+import Lucao from "../../assets/LucaoLogo.png";
+import React, { useState, useEffect, useContext } from "react";
 import {
   fetchClientes,
   createCliente,
   fetchTiposServicos,
   createVenda,
-} from "../services/api";
-import { GiBeard, GiScissors, GiRazor, GiHairStrands } from "react-icons/gi";
+} from "../../services/api";
+import { toast } from 'react-toastify';
+import { useNavigate } from "react-router-dom";
 import { FaPlus, FaHistory } from "react-icons/fa";
 import "./RegistrarVenda.css";
+import { ThemeContext } from "../../contexts/ThemeContext";
 
-const RegistrarVenda = ({ setCurrentPage }) => {
+const RegistrarVenda = ({ usuario }) => {
+  const navigate = useNavigate();
+  const { tema } = useContext(ThemeContext);
+  const isSalao = tema === 'salao';
+  const emojiLateral = isSalao ? '💅' : '💈';
+
   const [clientes, setClientes] = useState([]);
   const [servicos, setServicos] = useState([]);
   const [nomeCliente, setNomeCliente] = useState("");
   const [itens, setItens] = useState([]);
   const [totalEmCentavos, setTotalEmCentavos] = useState(0);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [abaAtiva, setAbaAtiva] = useState("cortes");
   const [formaPagamento, setFormaPagamento] = useState(""); // Novo estado para a forma de pagamento
   const [loading, setLoading] = useState(false);
@@ -32,14 +38,13 @@ const RegistrarVenda = ({ setCurrentPage }) => {
       setClientes(clientesData);
       setServicos(servicosData);
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
     }
   };
 
   useEffect(() => {
     loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // Este useEffect carrega dados que não dependem de props, então o array vazio está correto.
 
   useEffect(() => {
     const novoTotal = itens.reduce(
@@ -87,12 +92,10 @@ const RegistrarVenda = ({ setCurrentPage }) => {
     // Evita cliques múltiplos
     if (loading) return; // 👈 Bloqueia novas execuções
 
-    setError("");
-    setSuccess("");
     setLoading(true);
     // Remove formaPagamento da validação obrigatória
     if (!nomeCliente || itens.length === 0) {
-      setError("Digite o nome do cliente e adicione pelo menos um serviço.");
+      toast.warn("Digite o nome do cliente e adicione pelo menos um serviço.");
       setLoading(false);
       return;
     }
@@ -113,25 +116,17 @@ const RegistrarVenda = ({ setCurrentPage }) => {
 
       await createVenda(vendaData);
 
-      setSuccess(`Venda para "${cliente.nome}" registrada com sucesso!`);
+      toast.success(`Venda para "${cliente.nome}" registrada com sucesso!`);
       setNomeCliente("");
       setItens([]);
       setFormaPagamento(""); // Limpa a forma de pagamento após o sucesso
       console.log("venda finalizada ✅");
     } catch (err) {
       console.error(err);
-      setError(err.message || "Erro ao registrar a venda.");
+      toast.error(err.message || "Erro ao registrar a venda.");
     } finally {
       setLoading(false);
     }
-  };
-
-  const getServiceIcon = (serviceName) => {
-    const name = serviceName.toLowerCase();
-    if (name.includes("barba") && name.includes("corte")) return <GiRazor />;
-    if (name.includes("barba")) return <GiBeard />;
-    if (name.includes("corte")) return <GiScissors />;
-    return <GiHairStrands />;
   };
 
   const renderCortes = () => (
@@ -157,12 +152,7 @@ const RegistrarVenda = ({ setCurrentPage }) => {
               className="rv-service-item"
               onClick={() => handleAddServico(servico)} // Clicar no item adiciona o serviço
             >
-              <div className="rv-service-left">
-                <div className="rv-service-icon">
-                  {getServiceIcon(servico.nome)}
-                </div>
-                <span className="rv-service-name">{servico.nome}</span>
-              </div>
+              <span className="rv-service-name">{servico.nome}</span>
               <div className="rv-service-right">
                 <span className="rv-service-price">
                   {parseFloat(servico.valor_padrao).toLocaleString("pt-br", {
@@ -183,19 +173,20 @@ const RegistrarVenda = ({ setCurrentPage }) => {
       <section className="rv-itens-adicionados">
         <h3>Serviços Adicionados</h3>
         {itens.length === 0 && <p>Nenhum serviço adicionado.</p>}
-        <ul>
+        <ul className="rv-itens-lista">
           {itens.map((item, index) => (
             <li key={index} className="rv-item-adicionado">
-              {item.nome} -{" "}
-              {(item.valor_em_centavos / 100).toLocaleString("pt-br", {
-                style: "currency",
-                currency: "BRL",
-              })}
+              <div className="rv-item-details">
+                <span className="rv-item-nome">{item.nome}</span>
+                <span className="rv-item-valor">
+                  {(item.valor_em_centavos / 100).toLocaleString("pt-br", { style: "currency", currency: "BRL" })}
+                </span>
+              </div>
               <button
                 className="rv-remove-button"
                 onClick={() => handleRemoveServico(index)}
               >
-                ❌
+                &times;
               </button>
             </li>
           ))}
@@ -215,8 +206,8 @@ const RegistrarVenda = ({ setCurrentPage }) => {
             <option value="">Selecione...</option>
             <option value="Pix">Pix</option>
             <option value="Dinheiro">Dinheiro</option>
-            <option value="Cartao de Credito">Cartão de Crédito</option>
-            <option value="Cartao de Debito">Cartão de Débito</option>
+            <option value="Credito">Crédito</option>
+            <option value="Debito">Débito</option>
           </select>
         </div>
       </section>
@@ -230,27 +221,21 @@ const RegistrarVenda = ({ setCurrentPage }) => {
     </>
   );
 
+  const headerLogo = isSalao ? Cabelo : Logo;
+  const centralLogo = usuario?.configuracoes?.logo_url || (isSalao ? Cabelo : Lucao);
+
   return (
     <div className="rv-container">
       <header className="rv-header">
-        <div className="rv-header-text">Barbearia Lucão</div>
+        <div className="rv-header-text">
+          {usuario?.configuracoes?.nome_exibicao || (isSalao ? "Salão de Beleza" : "Barbearia Lucão")}
+        </div>
         <div className="rv-header-logo">
-          <img src={Logo} alt="Logo da Barbearia Lucão" />
+          <img src={headerLogo} alt={isSalao ? "Logo fixa do salão" : "Logo fixa da barbearia"} />
         </div>
       </header>
 
       <main className="rv-main-card">
-        <div className="rv-top-visuals">
-          <span role="img" aria-label="barber pole">
-            💈
-          </span>
-          <div className="rv-central-logo">
-            <img src={Lucao} alt="" />
-          </div>
-          <span role="img" aria-label="barber pole">
-            💈
-          </span>
-        </div>
 
         {/* Navegação por abas */}
         <div className="rv-tabs">
@@ -262,7 +247,7 @@ const RegistrarVenda = ({ setCurrentPage }) => {
           </div>
           <div
             className="rv-tab-item"
-            onClick={() => setCurrentPage("dashboard")}
+            onClick={() => navigate("/dashboard")}
           >
             Soma (
             {(totalEmCentavos / 100).toLocaleString("pt-br", {
@@ -276,16 +261,6 @@ const RegistrarVenda = ({ setCurrentPage }) => {
         {/* Conteúdo baseado na aba ativa */}
         {abaAtiva === "cortes" && renderCortes()}
 
-        {error && (
-          <p style={{ color: "red", marginTop: "1rem", textAlign: "center" }}>
-            {error}
-          </p>
-        )}
-        {success && (
-          <p style={{ color: "green", marginTop: "1rem", textAlign: "center" }}>
-            {success}
-          </p>
-        )}
       </main>
     </div>
   );

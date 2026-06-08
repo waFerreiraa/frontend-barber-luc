@@ -1,7 +1,9 @@
+
 import React, { useState } from "react";
-import { loginUser } from "../services/api";
+import { loginUser } from "../../services/api";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import "./Login.css";
+import { Link } from "react-router-dom";
 
 const Login = ({ onLogin }) => {
   const [form, setForm] = useState({ email: "", senha: "" });
@@ -10,8 +12,10 @@ const Login = ({ onLogin }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "", geral: "" });
+    const { name, value } = e.target;
+    const newValue = name === "email" ? value.toLowerCase() : value;
+    setForm({ ...form, [name]: newValue });
+    setErrors({ ...errors, [name]: "", geral: "" });
   };
 
   const handleSubmit = async (e) => {
@@ -90,6 +94,10 @@ const Login = ({ onLogin }) => {
         </button>
 
         {errors.geral && <p className="error-message">{errors.geral}</p>}
+
+        <div className="login-footer-links">
+          <Link to="/esqueci-senha">Esqueci minha senha</Link>
+        </div>
       </form>
     </div>
   );

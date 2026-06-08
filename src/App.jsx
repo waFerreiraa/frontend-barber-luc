@@ -1,17 +1,26 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { ThemeContext } from "./contexts/ThemeContext";
 import Navigation from "./components/Navigation/Navigation";
-import Dashboard from "./pages/Dashboard.jsx";
-import RegistrarVenda from "./pages/RegistrarVenda.jsx";
-import Historico from "./pages/Historico.jsx";
-import Gerenciar from "./pages/Gerenciar.jsx";
-import Agenda from "./pages/Agenda.jsx"; // Importar o novo componente Agenda
-import Login from "./pages/Login.jsx";
+import Dashboard from "./pages/DashBoard/Dashboard.jsx";
+import RegistrarVenda from "./pages/RegistrarVenda/RegistrarVenda.jsx";
+import Historico from "./pages/Historico/Historico.jsx";
+import Gerenciar from "./pages/Gerenciar/Gerenciar.jsx";
+import Agenda from "./pages/Agenda/Agenda.jsx"; // Importar o novo componente Agenda
+import AdminConfig from "./pages/AdminConfig/AdminConfig.jsx"; // ✅ NOVO: Importar página de Admin
+import Configuracoes from "./pages/Configuracao/Configuracoes.jsx"; // ✅ NOVO: Importar página de Configurações
+import EsqueciSenha from "./pages/Login/EsqueciSenha.jsx"; // ✅ NOVO
+import ResetarSenha from "./pages/Login/ResetarSenha.jsx"; // ✅ NOVO
+import Login from "./pages/Login/Login.jsx";
 import { registerLogoutHandler } from "./services/api";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState("dashboard");
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const { setTema } = useContext(ThemeContext);
+  const navigate = useNavigate(); // Hook para navegar programaticamente
 
   // Inicializa usuário a partir do localStorage
   useEffect(() => {
@@ -26,18 +35,39 @@ function App() {
     }
   }, []);
 
+  useEffect(() => {
+    if (user?.configuracoes?.layout_tipo) {
+      setTema(user.configuracoes.layout_tipo);
+    }
+  }, [user, setTema]);
+
+  // ✅ NOVO: Efeito para aplicar o tema de cores da empresa
+  useEffect(() => {
+    if (user?.configuracoes) {
+      const { cor_primaria, cor_secundaria } = user.configuracoes;
+
+      if (cor_primaria) {
+        document.documentElement.style.setProperty('--cor-primaria', cor_primaria);
+      }
+      if (cor_secundaria) {
+        document.documentElement.style.setProperty('--cor-secundaria', cor_secundaria);
+      }
+    }
+  }, [user]);
+
   // Função de logout
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     setUser(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setIsNavOpen(false);
-  };
+    navigate('/login');
+  }, [navigate]);
 
-  // Registra logout automático global
+
   useEffect(() => {
     registerLogoutHandler(handleLogout);
-  }, []);
+  }, [handleLogout]);
 
   const handleLogin = (loggedUser) => {
     const usuarioNormalizado = {
@@ -46,36 +76,59 @@ function App() {
     };
     setUser(usuarioNormalizado);
     localStorage.setItem("user", JSON.stringify(usuarioNormalizado));
+    navigate('/dashboard'); 
   };
 
-  const renderPage = () => {
-    switch (currentPage) {
-      case "dashboard":
-        return <Dashboard usuario={user} />;
-      case "registrarVenda":
-        return <RegistrarVenda setCurrentPage={setCurrentPage} />;
-      case "historico":
-        return <Historico />;
-      case "gerenciar":
-        return <Gerenciar />;
-      case "agenda": // NOVO: Adicionar case para a página de Agenda
-        return <Agenda usuario={user} />; // Passa o usuário para a Agenda, se necessário
-      default:
-        return <Dashboard usuario={user} />;
+
+  const handleConfigSave = (savedConfig) => {
+    if (user.empresa_id === savedConfig.empresa_id) {
+      setUser(currentUser => {
+        const updatedUser = {
+          ...currentUser,
+          configuracoes: { ...currentUser.configuracoes, ...savedConfig }
+        };
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        return updatedUser;
+      });
     }
   };
 
+  // Se não houver usuário, renderiza as páginas de autenticação
   if (!user) {
-    return <Login onLogin={handleLogin} />;
+    return (
+      <>
+        <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="dark" />
+        <Routes>
+          <Route path="/login" element={<Login onLogin={handleLogin} />} />
+          <Route path="/esqueci-senha" element={<EsqueciSenha />} />
+          <Route path="/resetar-senha/:token" element={<ResetarSenha />} />
+          {/* Qualquer outra rota redireciona para o login se não estiver logado */}
+          <Route path="*" element={<Navigate to="/login" />} />
+        </Routes>
+      </>
+    );
   }
 
   return (
     <>
+      {/* Container para as notificações bonitas */}
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
       <Navigation
-        setCurrentPage={setCurrentPage}
         isNavOpen={isNavOpen}
         setIsNavOpen={setIsNavOpen}
-        setUser={setUser}
+        onLogout={handleLogout} // Passa a função de logout
+        usuario={user}
       />
 
       <main className="main-content">
@@ -86,7 +139,17 @@ function App() {
           ☰
         </button>
 
-        {renderPage()}
+        <Routes>
+          <Route path="/dashboard" element={<Dashboard usuario={user} />} />
+          <Route path="/registrar-venda" element={<RegistrarVenda usuario={user} />} />
+          <Route path="/historico" element={<Historico usuario={user} />} />
+          <Route path="/gerenciar" element={<Gerenciar usuario={user} />} />
+          <Route path="/agenda" element={<Agenda usuario={user} />} />
+          <Route path="/configuracoes" element={<Configuracoes />} />
+          {/* Rota de Admin, acessível apenas ao dono */}
+          {user.tipo_usuario === 'dono' && <Route path="/admin" element={<AdminConfig onConfigSave={handleConfigSave} />} />}
+          <Route path="*" element={<Navigate to="/dashboard" />} />
+        </Routes>
       </main>
 
       {isNavOpen && (

@@ -1,0 +1,249 @@
+/* AdminConfig.css */
+.admin-config-container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    color: #e0e0e0;
+}
+
+.admin-config-container h1 {
+    color: var(--cor-primaria, #ff9800);
+    border-bottom: 2px solid #444;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.admin-config-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+/* Lista de Empresas */
+.empresas-list {
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    padding: 1.5rem;
+    height: fit-content;
+}
+
+.empresas-list h3 {
+    margin-top: 0;
+    color: #f0f0f0;
+    border-bottom: 1px solid #555;
+    padding-bottom: 0.75rem;
+}
+
+.empresas-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.empresas-list li {
+    padding: 0.8rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.empresas-list li:hover {
+    background-color: #3a3a3a;
+}
+
+.empresas-list li.selected {
+    background-color: var(--cor-primaria, #ff9800);
+    color: #121212;
+    font-weight: bold;
+}
+
+.customized-indicator {
+    font-size: 1.2rem;
+}
+
+/* Formulário de Configuração */
+.config-form-section {
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    padding: 2rem;
+}
+
+.config-form-section h3 {
+    margin-top: 0;
+    color: #f0f0f0;
+}
+
+.config-form-section form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.config-form-section .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.config-form-section .form-group-inline {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.config-form-section .form-group-inline .form-group {
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+}
+
+.config-form-section label {
+    font-weight: 500;
+    color: #ccc;
+}
+
+.config-form-section input[type="text"] {
+    padding: 0.8rem;
+    border-radius: 8px;
+    border: 1px solid #666;
+    background-color: #333;
+    color: #fff;
+    font-size: 1rem;
+}
+
+.config-form-section input[type="color"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 50px;
+    height: 50px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+.config-form-section input[type="color"]::-webkit-color-swatch {
+    border-radius: 50%;
+    border: 2px solid #555;
+}
+.config-form-section input[type="color"]::-moz-color-swatch {
+    border-radius: 50%;
+    border: 2px solid #555;
+}
+
+.placeholder-text {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: #888;
+    text-align: center;
+    font-style: italic;
+}
+
+.config-form-section select {
+    padding: 0.8rem;
+    border-radius: 8px;
+    border: 1px solid #666;
+    background-color: #333;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.logo-preview {
+    margin-bottom: 1rem;
+    background-color: #333;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px dashed #555;
+}
+
+.logo-preview img {
+    max-width: 200px;
+    max-height: 100px;
+    object-fit: contain;
+}
+
+.config-form-section input[type="file"] {
+    padding: 0.5rem;
+    background-color: #333;
+    border: 1px solid #666;
+    border-radius: 8px;
+    color: #ccc;
+    cursor: pointer;
+}
+
+.config-form-section input[type="file"]::-webkit-file-upload-button {
+    background: #444;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 1rem;
+    transition: background-color 0.2s;
+}
+
+.config-form-section input[type="file"]::-webkit-file-upload-button:hover {
+    background: #555;
+}
+
+.admin-error {
+    color: #ff4d4f;
+    background-color: #4d2a2a;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ff4d4f;
+}
+
+.admin-success {
+    color: #52c41a;
+    background-color: #2a4d2a;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #52c41a;
+}
+
+.button-secondary {
+    background: #555;
+    color: #fff;
+    margin-top: 0.5rem;
+}
+
+.button-secondary:hover {
+    background: #666;
+}
+
+.button-secondary:disabled {
+    background: #444;
+    cursor: not-allowed;
+}
+@media (max-width: 900px) {
+    .admin-config-layout {
+        grid-template-columns: 1fr; /* Coluna única para o layout principal */
+    }
+    .admin-config-container {
+        padding: 1rem; /* Reduz o padding em telas menores */
+    }
+}
+
+@media (max-width: 600px) {
+    .admin-config-container h1 {
+        font-size: 1.8rem; /* Título um pouco menor */
+    }
+
+    .config-form-section {
+        padding: 1.5rem; /* Menos padding no formulário */
+    }
+
+    .config-form-section .form-group-inline {
+        flex-direction: column; /* Empilha os seletores de cor */
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
+}

@@ -51,10 +51,44 @@
     padding: 0.75rem;
     border-radius: 4px;
     border: 1px solid var(--border-color);
-    background-color: #333;
+    background-color: var(--input-bg-color);
     color: var(--text-color);
     font-size: 1rem;
     box-sizing: border-box;
+}
+
+/* Tema salão: ajustar títulos e campos para contraste claro */
+body.theme-salao .agendamento-modal-content h2 {
+    color: #7A6B62; /* manter títulos em cinza no tema salão */
+}
+
+body.theme-salao .agendamento-modal-content .agenda-form label {
+    color: #7A6B62;
+}
+
+body.theme-salao .agendamento-modal-content .agenda-form input[type="text"],
+body.theme-salao .agendamento-modal-content .agenda-form input[type="number"],
+body.theme-salao .agendamento-modal-content .agenda-form input[type="datetime-local"],
+body.theme-salao .agendamento-modal-content .agenda-form select,
+body.theme-salao .agendamento-modal-content .agenda-form textarea {
+    background-color: #fff; /* fundo claro para formularios */
+    color: #2F2A28; /* texto escuro */
+    border: 1px solid rgba(47,42,40,0.12);
+}
+
+body.theme-salao .agendamento-modal-content .agenda-form input::placeholder,
+body.theme-salao .agendamento-modal-content .agenda-form textarea::placeholder {
+    color: #7A6B62;
+    opacity: 0.8;
+}
+
+/* Ajuste de foco usando cor primária do salão */
+body.theme-salao .agendamento-modal-content .agenda-form input:focus,
+body.theme-salao .agendamento-modal-content .agenda-form select:focus,
+body.theme-salao .agendamento-modal-content .agenda-form textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(214,51,132,0.08);
+    border-color: var(--cor-primaria, #d63384);
 }
 
 .agendamento-modal-content .modal-actions {

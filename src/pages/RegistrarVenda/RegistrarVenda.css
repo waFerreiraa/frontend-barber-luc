@@ -2,7 +2,8 @@
 .rv-container {
     width: 100%;
     min-height: 100vh;
-    background-color: #1a1a1a;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     padding: 1.5rem 1rem;
     box-sizing: border-box;
     display: flex;
@@ -27,14 +28,14 @@
   }
 }
 
-/* Header superior com o nome da barbearia */
+/* Header superior com o nome da empresa */
 .rv-header {
     width: 100%;
     max-width: 500px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: white;
+    color: var(--text-color);
     margin-bottom: 2rem;
 }
 
@@ -42,6 +43,7 @@
     font-size: 2.5rem;
     font-weight: 700;
     line-height: 1.1;
+    color: var(--text-color);
 }
 
 .rv-header-logo img {
@@ -49,23 +51,49 @@
     height: auto;
 }
 
-/* Card principal branco com cantos arredondados */
+/* Garantir que não exista borda visível no logo do header */
+.rv-header-logo img {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Aplicações específicas do tema salão: várias regras para garantir especificidade */
+.rv-salao .rv-header-text {
+    color: var(--cor-primaria, #d63384);
+}
+.rv-container.rv-salao .rv-header-text {
+    color: var(--cor-primaria, #d63384);
+}
+body.theme-salao .rv-header-text {
+    color: var(--cor-primaria, #d63384);
+}
+
+.rv-salao .rv-header-logo img {
+    border-radius: 1rem;
+}
+
+body.theme-salao .rv-header-logo img {
+    /* borda removida por solicitação do usuário */
+}
+
+/* Card principal com cantos arredondados e cores do tema */
 .rv-main-card {
     width: 100%;
     max-width: 600px;
-    background-color: #f4f4f4;
+    background-color: var(--surface-color);
     border-radius: 25px;
     padding: 1.5rem;
     box-sizing: border-box;
-    color: #000000;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    color: var(--text-color);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
 }
 
 /* Parte visual com os postes de barbeiro e o logo central */
 .rv-top-visuals {
     display: flex;
-    justify-content: space-between;
+    justify-content: center; /* centraliza o logo */
     align-items: center;
+    gap: 1.5rem; /* espaço caso precise adicionar algo depois */
     margin-bottom: 1.5rem;
     font-size: 3rem;
 }
@@ -73,7 +101,7 @@
 .rv-central-logo {
     width: 100px;
     height: 100px;
-    background-color: #1a1a1a;
+    background-color: var(--surface-color);
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -92,10 +120,11 @@
 .rv-tabs {
     display: flex;
     justify-content: space-around;
-    background-color: #e0e0e0;
+    background-color: rgba(255, 255, 255, 0.08);
     border-radius: 12px;
     padding: 0.5rem;
     margin-bottom: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .rv-tab-item {
@@ -103,12 +132,17 @@
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s;
-    color: #555;
+    transition: background-color 0.2s, color 0.2s;
+    color: var(--text-color);
 }
 
 .rv-tab-item.active {
-    background-color: #1a1a1a;
+    background-color: var(--cor-primaria, #ff9800);
+    color: var(--button-text-color);
+}
+
+.rv-salao .rv-tab-item.active {
+    background-color: var(--cor-primaria, #d63384);
     color: white;
 }
 
@@ -120,7 +154,7 @@
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 0.5rem;
-    color: #000000; /* Alterado para preto para maior visibilidade */
+    color: var(--text-color);
 }
 
 .rv-payment-method-section .form-group select {
@@ -129,14 +163,17 @@
     font-size: 1.1rem;
     border-radius: 10px;
     box-sizing: border-box;
-    border: 1px solid #ccc;
-    color: #000000; /* Garante que o texto dentro do select seja preto */
-    background-color: #ffffff; /* Fundo branco para o select */
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    background-color: var(--input-bg-color);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08); /* Sombra sutil */
 }
 
 .rv-payment-method-section .form-group select:focus {
     outline: none;
-    border-color: #1a1a1a;
+    border-color: var(--cor-primaria, #ff9800); /* Usa a cor primária no foco */
+    box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.2); /* Efeito de anel de foco */
 }
 
 .rv-client-input {
@@ -145,12 +182,17 @@
     font-size: 1.1rem;
     border-radius: 10px;
     box-sizing: border-box;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
+    background-color: var(--input-bg-color);
+    color: var(--text-color);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05); /* Sombra sutil */
 }
 
 .rv-client-input:focus {
     outline: none;
-    border-color: #1a1a1a;
+    border-color: var(--cor-primaria, #ff9800); /* Usa a cor primária no foco */
+    box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.2); /* Efeito de anel de foco */
 }
 
 /* Lista de serviços */
@@ -162,32 +204,24 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: #e9e9e9;
+    background-color: rgba(255, 255, 255, 0.08);
     padding: 1rem;
     border-radius: 12px;
     margin-bottom: 0.8rem;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .rv-service-item:hover {
     transform: scale(1.02);
-}
-
-.rv-service-left {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.rv-service-icon {
-    font-size: 2.5rem;
-    color: #1a1a1a;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
 }
 
 .rv-service-name {
     font-weight: 600;
     font-size: 1.1rem;
+    color: var(--text-color);
 }
 
 .rv-service-right {
@@ -199,26 +233,26 @@
 .rv-service-price {
     font-weight: 700;
     font-size: 1.2rem;
-    color: #1a1a1a;
+    color: var(--cor-primaria);
 }
 
 .rv-add-button {
     font-size: 1.5rem;
-    color: #1a1a1a;
+    color: var(--text-color);
 }
 
 /* --- Itens adicionados --- */
 .rv-itens-adicionados {
     margin-top: 2rem;
-    background: linear-gradient(135deg, #e9f5e9 0%, #d4edda 100%);
+    background-color: rgba(255, 255, 255, 0.08);
     border-radius: 15px;
     padding: 1.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .rv-itens-adicionados h3 {
     margin-bottom: 1.2rem;
-    color: #1a1a1a;
+    color: var(--text-color);
     font-size: 1.2rem;
 }
 
@@ -233,7 +267,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: white;
+    background-color: var(--surface-color);
     padding: 1rem;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -246,25 +280,6 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
-.rv-item-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex: 1;
-}
-
-.rv-item-icon {
-    font-size: 2rem;
-    color: #1a1a1a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 45px;
-    height: 45px;
-    background-color: #f0f0f0;
-    border-radius: 10px;
-}
-
 .rv-item-details {
     display: flex;
     flex-direction: column;
@@ -274,13 +289,13 @@
 .rv-item-nome {
     font-weight: 600;
     font-size: 1rem;
-    color: #1a1a1a;
+    color: var(--text-color);
 }
 
 .rv-item-valor {
     font-weight: 700;
     font-size: 1.1rem;
-    color: #27ae60;
+    color: var(--cor-primaria);
 }
 
 .rv-remove-button {
@@ -326,10 +341,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 1.2rem;
+    margin-top: 1.5rem;
     padding: 1.2rem;
-    background-color: #1a1a1a;
+    background: linear-gradient(135deg, #2c2c2c, #1a1a1a);
     border-radius: 12px;
+    border: 1px solid #444;
     color: white;
 }
 
@@ -348,25 +364,37 @@
 .rv-submit-button {
     width: 100%;
     padding: 1rem;
-    margin-top: 1.6rem;
-    background-color: #1a1a1a;
-    color: white;
+    margin-top: 1.5rem;
+    background: var(--cor-primaria, #28a745);
+    color: var(--button-text-color);
     border: none;
     border-radius: 12px;
     font-size: 1.8rem;
     font-weight: 700;
     cursor: pointer;
-    /* padding-bottom: 50px; - Considerar se este padding é intencional e como ele afeta o layout */
-    transition: background-color 0.2s;
+    transition: all 0.3s ease;
 }
 
 .rv-submit-button:hover {
-    background-color: #333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.18);
+}
+
+.rv-salao .rv-submit-button {
+    background: linear-gradient(135deg, var(--cor-primaria, #d63384), var(--cor-secundaria, #a61d67));
+}
+
+.rv-salao .rv-submit-button:hover {
+    box-shadow: 0 4px 15px rgba(214, 51, 132, 0.4);
 }
 
 .rv-submit-button:disabled {
-    background-color: #a0a0a0;
+    background: #555;
+    color: #999;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    opacity: 0.7;
 }
 
 /* Mensagens de erro e sucesso */
@@ -388,6 +416,83 @@
     background-color: #e8f5e8;
     color: #00b894;
     border: 1px solid #81ecec;
+}
+
+/* Tema específico de salão */
+.rv-salao .rv-main-card {
+    background-color: #fff4f8;
+}
+.rv-salao .rv-header-text {
+    color: var(--cor-primaria, #d63384);
+}
+.rv-salao .rv-header-logo img {
+    border-radius: 1rem;
+}
+.rv-salao .rv-tab-item.active {
+    background-color: var(--cor-primaria, #d63384);
+    color: white;
+}
+.rv-salao .rv-submit-button {
+    background: var(--cor-primaria, #d63384);
+    color: #ffffff;
+    text-shadow: none;
+    font-size: 1.6rem;
+    padding: 0.9rem 1rem;
+    border-radius: 12px;
+    border: 0;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+.rv-salao .rv-submit-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.10);
+}
+
+/* Tema salão (espelhando o Dashboard) */
+body.theme-salao .rv-container {
+    background-color: #F7F4F1;
+}
+body.theme-salao .rv-header {
+    color: #7A6B62;
+}
+body.theme-salao .rv-main-card {
+    background-color: #FFFFFF;
+    color: #2F2A28;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+}
+body.theme-salao .rv-top-visuals {
+    color: #7A6B62;
+}
+body.theme-salao .rv-central-logo {
+    background-color: #7A6B62;
+    border-color: rgba(122, 107, 98, 0.25);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25);
+}
+body.theme-salao .rv-client-section h3,
+body.theme-salao .rv-services-section h3,
+body.theme-salao .rv-itens-adicionados h3,
+body.theme-salao .rv-payment-method-section h3 {
+    color: #2D2D2D;
+}
+body.theme-salao .rv-item-valor {
+    color: #2D2D2D;
+}
+body.theme-salao .rv-tab-item.active {
+    background-color: #7A6B62;
+    color: white;
+}
+body.theme-salao .rv-submit-button {
+    background: var(--cor-primaria, #d63384);
+    color: #ffffff;
+    text-shadow: none;
+    font-size: 1.6rem;
+    padding: 0.9rem 1rem;
+    border-radius: 12px;
+    border: 0;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+body.theme-salao .rv-submit-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.20);
 }
 
 /* Responsividade */
@@ -472,8 +577,9 @@
 }
 
 
+    /* Ajuste para evitar que as listas ocupem muito espaço vertical em telas pequenas */
     .rv-services-section, .rv-itens-adicionados {
-        max-height: 35vh;
+        max-height: 25vh; /* Reduzido de 35vh para dar mais espaço para outros elementos */
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
     }

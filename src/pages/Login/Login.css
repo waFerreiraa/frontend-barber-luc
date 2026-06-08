@@ -128,6 +128,21 @@ html, body {
   transform: scale(1.03);
 }
 
+.login-footer-links {
+  margin-top: 1.5rem; /* Adiciona espaço acima do link */
+  text-align: center;
+}
+
+.login-footer-links a {
+  color: white;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.login-footer-links a:hover {
+  color: #f0a500; /* Cor primária do login no hover */
+}
+
 .login-form button[disabled] {
   background: #777;
   cursor: not-allowed;
