@@ -29,7 +29,7 @@
 
 .modal-content h2 {
     font-size: 1.8rem;
-    color: #ff9800; /* Cor do título */
+    color: var(--cor-primaria, #ff9800); /* Usa a variável, com fallback para laranja */
     margin-bottom: 1rem;
     text-align: center;
 }
@@ -58,7 +58,7 @@
 }
 
 .modal-content input:focus {
-    border-color: #ff9800;
+    border-color: var(--cor-primaria, #ff9800);
     outline: none;
     background-color: #444;
 }

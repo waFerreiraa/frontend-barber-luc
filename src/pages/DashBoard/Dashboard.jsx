@@ -1,11 +1,14 @@
-import Logo from "../assets/penteado.png";
-import Lucao from "../assets/LucaoLogo.png";
-import React, { useState, useEffect } from "react";
+import Logo from "../../assets/penteado.png";
+import Cabelo from "../../assets/mulher.png";
+import Lucao from "../../assets/LucaoLogo.png";
+import React, { useState, useEffect, useContext } from "react";
 import { FaCalendarDay, FaCalendarAlt, FaChartLine } from "react-icons/fa";
 import "./Dashboard.css";
-import { fetchHistorico, gerarRelatorioGanhos } from "../services/api";
+import { fetchHistorico, gerarRelatorioGanhos } from "../../services/api";
+import { ThemeContext } from "../../contexts/ThemeContext";
 
 const Dashboard = ({ token, usuario }) => {
+  const { tema } = useContext(ThemeContext);
   const [sumario, setSumario] = useState({
     faturamentoDia: 0,
     faturamentoMes: 0,
@@ -25,6 +28,8 @@ const Dashboard = ({ token, usuario }) => {
       style: "currency",
       currency: "BRL",
     }).format(value);
+
+  const headerTitle = usuario?.configuracoes?.nome_exibicao || (tema === "salao" ? "Salão Lucão" : "Barbearia Lucão");
 
  useEffect(() => {
   const getDashboardData = async () => {
@@ -233,23 +238,23 @@ const Dashboard = ({ token, usuario }) => {
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
-        <div className="dashboard-header-text">Barbearia Lucão</div>
+        <div className="dashboard-header-text">{headerTitle}</div>
         <div className="dashboard-header-logo">
-          <img src={Logo} alt="Logo Barbearia Lucão" />
+          <img
+            src={tema === "salao" ? Cabelo : Logo}
+            alt={tema === "salao" ? "Logo fixa do Salão Lucão" : "Logo fixa da Barbearia Lucão"}
+          />
         </div>
       </header>
 
       <main className="dashboard-main-card">
         <div className="dashboard-top-visuals">
-          <span role="img" aria-label="barber pole">
-            💈
-          </span>
           <div className="dashboard-central-logo">
-            <img src={Lucao} alt="Lucao Logo" />
+            <img
+              src={usuario?.configuracoes?.logo_url || Lucao}
+              alt={usuario?.configuracoes?.logo_url ? `Logo de ${usuario?.configuracoes?.nome_exibicao || "empresa"}` : "Lucao Logo"}
+            />
           </div>
-          <span role="img" aria-label="barber pole">
-            💈
-          </span>
         </div>
 
         <section className="dashboard-content">

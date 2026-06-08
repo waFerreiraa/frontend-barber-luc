@@ -205,13 +205,13 @@ export const deleteAgendamento = async (id) => {
 
 // --- COLABORADORES (BARBEIROS) ---
 export const fetchColaboradores = async () => {
-  const response = await fetch(`${BASE_URL}/api/colaboradores`, { headers: { ...getAuthHeaders() } });
+  const response = await fetch(`${BASE_URL}/api/auth/colaboradores`, { headers: { ...getAuthHeaders() } });
   return handleResponse(response);
 };
 
 // --- LOGIN ---
 export const loginUser = async (email, senha) => {
-  const response = await fetch(`${BASE_URL}/api/login`, {
+  const response = await fetch(`${BASE_URL}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, senha }),
@@ -228,6 +228,7 @@ export const loginUser = async (email, senha) => {
     nome: data.nome,
     tipo_usuario: data.tipo_usuario,
     empresa_id: data.empresa_id, // ✅ útil pro front (UI/debug)
+    configuracoes: data.configuracoes || {}, // ✅ Salva as configurações
     token: data.token,
   };
 
@@ -253,7 +254,9 @@ export const gerarRelatorioGanhos = async (mes, ano) => {
     try {
       const errorData = await response.json();
       msg = errorData?.error || msg;
-    } catch {}
+    } catch (error) {
+      console.warn('Não foi possível ler o erro JSON do PDF', error);
+    }
     throw new Error(msg);
   }
 
@@ -268,4 +271,102 @@ export const gerarRelatorioGanhos = async (mes, ano) => {
 export const logoutUser = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
+};
+
+// --- ADMIN CONFIG ---
+export const fetchEmpresasParaAdmin = async () => {
+  const response = await fetch(`${BASE_URL}/api/admin/empresas-config`, {
+    headers: { ...getAuthHeaders() },
+  });
+  return handleResponse(response);
+};
+
+export const saveEmpresaConfig = async (configData) => {
+  const response = await fetch(`${BASE_URL}/api/admin/empresas-config`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+    body: JSON.stringify(configData),
+  });
+  return handleResponse(response);
+};
+
+export const createUserByOwner = async (userData) => {
+  const response = await fetch(`${BASE_URL}/api/admin/usuarios`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+    body: JSON.stringify(userData),
+  });
+  return handleResponse(response);
+};
+
+// --- REGISTRO INICIAL (EMPRESA + ADMIN) ---
+export const createInitialUserAndCompany = async (registrationData) => {
+  // registrationData deve conter: empresa_nome, nome, email, senha, layout_tipo
+  const response = await fetch(`${BASE_URL}/api/registro`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, // Endpoint público, sem token
+    body: JSON.stringify(registrationData),
+  });
+  return handleResponse(response);
+};
+
+export const createCollaborator = async (userData) => {
+  const response = await fetch(`${BASE_URL}/api/auth/usuarios`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+    body: JSON.stringify(userData),
+  });
+  return handleResponse(response);
+};
+
+export const uploadEmpresaLogo = async (empresaId, logoFile) => {
+  const formData = new FormData();
+  formData.append('logo', logoFile);
+
+  const response = await fetch(`${BASE_URL}/api/admin/empresas-config/${empresaId}/logo`, {
+    method: 'POST',
+    headers: { ...getAuthHeaders() }, // O browser define o Content-Type para FormData
+    body: formData,
+  });
+  return handleResponse(response);
+};
+
+// ✅ NOVO: Função para alterar a senha do usuário logado
+export const alterarMinhaSenha = async (senhaData) => {
+  const response = await fetch(`${BASE_URL}/api/auth/alterar-senha`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+    body: JSON.stringify(senhaData),
+  });
+  return handleResponse(response);
+};
+
+// ✅ NOVO: Função para alterar o email do usuário logado
+export const alterarMeuEmail = async (emailData) => {
+  const response = await fetch(`${BASE_URL}/api/auth/alterar-email`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+    body: JSON.stringify(emailData),
+  });
+  return handleResponse(response);
+};
+
+// ✅ NOVO: Função para solicitar redefinição de senha
+export const solicitarResetSenha = async (email) => {
+  const response = await fetch(`${BASE_URL}/api/auth/esqueci-senha`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+  return handleResponse(response);
+};
+
+// ✅ NOVO: Função para redefinir a senha com o token
+export const resetarSenha = async (token, nova_senha) => {
+  const response = await fetch(`${BASE_URL}/api/auth/resetar-senha`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token, nova_senha }),
+  });
+  return handleResponse(response);
 };

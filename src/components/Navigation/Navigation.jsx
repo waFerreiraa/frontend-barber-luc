@@ -1,65 +1,61 @@
 import React from "react";
+import { NavLink } from "react-router-dom";
 import {
-  FaTachometerAlt,
+  FaHome,
   FaCashRegister,
   FaHistory,
-  FaUsers, // Mantém FaUsers para "Serviços"
+  FaUsersCog,
+  FaTools,
+  FaCog,
   FaSignOutAlt,
+  FaCalendarAlt,
 } from "react-icons/fa";
-import { FaCalendarAlt } from "react-icons/fa"; // Importar ícone de calendário
 import "./Navigation.css";
-import { logoutUser } from "../../services/api"; // Certifique-se de que esta importação está correta
 
-const Navigation = ({ currentPage, setCurrentPage, isNavOpen, setIsNavOpen, setUser }) => {
-  const handleNavClick = (page) => {
-    setCurrentPage(page);
+const Navigation = ({ isNavOpen, setIsNavOpen, onLogout, usuario }) => {
+  const handleLinkClick = () => {
     setIsNavOpen(false);
   };
 
-  const handleLogout = () => {
-    logoutUser(); // limpa token e user
-    setUser(null); // redireciona para Login
-    setIsNavOpen(false);
-  };
+  const isAdmin = usuario?.tipo_usuario === 'admin' || usuario?.tipo_usuario === 'dono';
+  const isDono = usuario?.tipo_usuario === 'dono';
 
   return (
     <nav className={`sidebar ${isNavOpen ? "open" : ""}`}>
       <div className="sidebar-header">
-        <h2>Barbearia</h2>
-        <span>Painel</span>
-        <button
-          className="close-button"
-          onClick={() => setIsNavOpen(false)}
-          aria-label="Fechar menu"
-        >
-          &times;
-        </button>
+        <h2>Menu</h2>
+        <button onClick={() => setIsNavOpen(false)} className="close-button">&times;</button>
       </div>
 
-      <ul>
-        <li onClick={() => handleNavClick("dashboard")}>
-          <FaTachometerAlt className="icon" /> Dashboard
-        </li>
-        <li onClick={() => handleNavClick("registrarVenda")}>
-          <FaCashRegister className="icon" /> Registrar Venda
-        </li>
-        <li onClick={() => handleNavClick("historico")}>
-          <FaHistory className="icon" /> Histórico
-        </li>
-        <li onClick={() => handleNavClick("gerenciar")}>
-          <FaUsers className="icon" /> Serviços
-        </li>
-        {/* NOVO: Link para a Agenda */}
-        <li
-          onClick={() => handleNavClick("agenda")}
-          className={currentPage === "agenda" ? "active" : ""}
-        >
-          <FaCalendarAlt className="icon" /> Agenda
-        </li>
-        <li onClick={handleLogout} className="logout-button">
-          <FaSignOutAlt className="icon" /> Sair
-        </li>
+      {/* A lista principal de navegação */}
+      <ul className="main-nav-list">
+        <li><NavLink to="/dashboard" onClick={handleLinkClick} className={({ isActive }) => isActive ? 'active' : ''}><FaHome /> <span>Dashboard</span></NavLink></li>
+        <li><NavLink to="/registrar-venda" onClick={handleLinkClick} className={({ isActive }) => isActive ? 'active' : ''}><FaCashRegister /> <span>Registrar Venda</span></NavLink></li>
+        <li><NavLink to="/agenda" onClick={handleLinkClick} className={({ isActive }) => isActive ? 'active' : ''}><FaCalendarAlt /> <span>Agenda</span></NavLink></li>
+        <li><NavLink to="/historico" onClick={handleLinkClick} className={({ isActive }) => isActive ? 'active' : ''}><FaHistory /> <span>Histórico</span></NavLink></li>
+        {isAdmin && (
+          <li><NavLink to="/gerenciar" onClick={handleLinkClick} className={({ isActive }) => isActive ? 'active' : ''}><FaUsersCog /> <span>Gerenciar</span></NavLink></li>
+        )}
+        {isDono && (
+          <li><NavLink to="/admin" onClick={handleLinkClick} className={({ isActive }) => isActive ? 'active' : ''}><FaTools /> <span>Admin</span></NavLink></li>
+        )}
       </ul>
+
+      {/* Itens do rodapé, agora dentro de uma lista válida */}
+      <div className="sidebar-footer">
+        <ul>
+          <li>
+            <NavLink to="/configuracoes" onClick={handleLinkClick} className={({ isActive }) => isActive ? 'active' : ''}>
+              <FaCog /> <span>Configurações</span>
+            </NavLink>
+          </li>
+          <li>
+            <button onClick={onLogout} className="logout-button">
+              <FaSignOutAlt /> <span>Sair</span>
+            </button>
+          </li>
+        </ul>
+      </div>
     </nav>
   );
 };

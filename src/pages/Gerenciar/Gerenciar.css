@@ -1,0 +1,322 @@
+/* Gerenciar.css */
+
+/* Container principal */
+.gerenciar-container {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #1a1a1a;
+    padding: 2rem 1rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #fff;
+    padding-bottom: 4rem;
+}
+
+/* Título da página */
+.gerenciar-container h1, .gerenciar-container h2 {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+/* Mensagens de sucesso e erro */
+.gerenciar-container p {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+/* NOVO: Container para os botões de ação */
+.gerenciar-action-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+    width: 100%;
+    max-width: 900px; /* Alinha com o grid de cards abaixo */
+}
+
+.gerenciar-error {
+    color: #ff4444;
+}
+
+.gerenciar-success {
+    color: #4CAF50;
+}
+
+/* Grid para os cards */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    width: 100%;
+    max-width: 900px;
+}
+
+/* Card */
+.gerenciar-card {
+    background-color: #222;
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    color: #e0e0e0;
+    animation: card-appear 0.4s ease-out; /* Animação de entrada */
+}
+
+@keyframes card-appear {
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Títulos dentro do card */
+.gerenciar-card h3, .gerenciar-card h4 {
+    margin: 0 0 1rem 0;
+    color: var(--cor-primaria, #ff9800);
+    font-weight: 600;
+}
+
+/* Formulários */
+.gerenciar-card form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Inputs e labels */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.form-group label {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #666;
+    background-color: #333;
+    color: #fff;
+    font-size: 1rem;
+    transition: border 0.2s, background-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: var(--cor-primaria, #ff9800);
+    outline: none;
+    background-color: #444;
+}
+
+/* Botão */
+.button {
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(90deg, var(--cor-primaria, #ff9800));
+    color: #222;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255,152,0,0.4);
+}
+
+.button:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* Listas */
+.gerenciar-servicos-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 350px; /* Limita a altura da lista */
+    overflow-y: auto; /* Adiciona scroll quando a lista for maior que a altura máxima */
+    
+    /* Remove a barra de rolagem visualmente */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+/* Esconde a barra de rolagem para navegadores Webkit (Chrome, Safari, etc.) */
+.gerenciar-servicos-list::-webkit-scrollbar {
+    display: none;
+}
+
+.gerenciar-servico-item {
+    background-color: #333;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.2s ease;
+}
+
+.gerenciar-servico-item:hover {
+    background-color: #3a3a3a;
+}
+
+.gerenciar-servico-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.gerenciar-servico-name {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #f0f0f0;
+}
+
+.gerenciar-servico-price {
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+/* Action buttons for services list */
+.gerenciar-servico-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.gerenciar-action-button {
+    background: transparent;
+    border: none;
+    color: #ccc;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s, background-color 0.2s;
+}
+
+.gerenciar-action-button:hover {
+    color: #fff;
+}
+
+.gerenciar-edit-button:hover {
+    background-color: #28a745; /* Verde */
+}
+
+.gerenciar-delete-button:hover {
+    background-color: #dc3545; /* Vermelho */
+}
+
+/* Responsivo */
+@media (max-width: 600px) {
+    .grid-container {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .gerenciar-card {
+        padding: 1rem;
+    }
+
+    .gerenciar-container h1 {
+        font-size: 2rem;
+    }
+
+    .form-group input {
+        font-size: 1rem;
+    }
+}
+
+/* Tema Salão (Overrides específicos) */
+body.theme-salao .gerenciar-container {
+    background-color: #F7F4F1;
+    color: #2F2A28;
+}
+
+body.theme-salao .gerenciar-card {
+    background-color: #FFFFFF;
+    color: #2F2A28;
+    box-shadow: 0 16px 40px rgba(122, 107, 98, 0.12);
+}
+
+body.theme-salao .gerenciar-card h3,
+body.theme-salao .gerenciar-card h4 {
+    color: #2D2D2D;
+}
+
+body.theme-salao .form-group label {
+    color: #2D2D2D;
+}
+
+body.theme-salao .form-group input,
+body.theme-salao .form-group select {
+    background-color: #ffffff;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+body.theme-salao .form-group input:focus,
+body.theme-salao .form-group select:focus {
+    background-color: #fafafa;
+    border-color: var(--cor-primaria, #d63384);
+}
+
+body.theme-salao .button {
+    background: var(--cor-primaria, #d63384);
+    color: #ffffff;
+}
+
+body.theme-salao .gerenciar-servico-item {
+    background-color: #F9F9F9;
+    border: 1px solid #EAEAEA;
+}
+
+body.theme-salao .gerenciar-servico-item:hover {
+    background-color: #F1F1F1;
+}
+
+body.theme-salao .gerenciar-servico-name {
+    color: #2D2D2D;
+}
+
+body.theme-salao .gerenciar-servico-price {
+    color: #666;
+}
+
+body.theme-salao .gerenciar-action-button {
+    color: #888;
+}
+body.theme-salao .gerenciar-action-button:hover {
+    color: #333;
+}
+body.theme-salao .gerenciar-edit-button:hover {
+    background-color: #28a745;
+    color: #fff;
+}
+body.theme-salao .gerenciar-delete-button:hover {
+    background-color: #dc3545;
+    color: #fff;
+}

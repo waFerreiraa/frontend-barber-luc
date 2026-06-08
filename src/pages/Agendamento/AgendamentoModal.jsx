@@ -3,7 +3,6 @@ import "./AgendamentoModal.css"; // CSS para o modal
 
 const AgendamentoModal = ({
   agendamentoToEdit,
-  colaboradores,
   servicosCadastrados, // Lista de tipos_servicos
   onSave,
   onCancel,
@@ -12,7 +11,6 @@ const AgendamentoModal = ({
   success,
 }) => {
   const [formClienteNome, setFormClienteNome] = useState("");
-  const [formColaboradorId, setFormColaboradorId] = useState("");
   const [formServicoNome, setFormServicoNome] = useState("");
   const [formServicoDuracao, setFormServicoDuracao] = useState("");
   const [formDataHoraInicio, setFormDataHoraInicio] = useState("");
@@ -24,7 +22,6 @@ const AgendamentoModal = ({
   useEffect(() => {
     if (agendamentoToEdit) {
       setFormClienteNome(agendamentoToEdit.cliente_nome || "");
-      setFormColaboradorId(agendamentoToEdit.usuarios?.id || "");
       setFormServicoNome(agendamentoToEdit.servico_nome || "");
       setFormServicoDuracao(agendamentoToEdit.servico_duracao_minutos || "");
       setFormDataHoraInicio(
@@ -35,7 +32,6 @@ const AgendamentoModal = ({
     } else {
       // Resetar formulário para novo agendamento
       setFormClienteNome("");
-      setFormColaboradorId("");
       setFormServicoNome("");
       setFormServicoDuracao("");
       setFormDataHoraInicio("");
@@ -64,7 +60,6 @@ const AgendamentoModal = ({
     e.preventDefault();
     if (
       !formClienteNome ||
-      !formColaboradorId ||
       !formServicoNome ||
       !formServicoDuracao ||
       !formDataHoraInicio ||
@@ -76,7 +71,6 @@ const AgendamentoModal = ({
 
     const agendamentoData = {
       cliente_nome: formClienteNome,
-      usuario_id: formColaboradorId,
       servico_nome: formServicoNome,
       servico_duracao_minutos: Number(formServicoDuracao),
       data_hora_inicio: formDataHoraInicio,
@@ -108,25 +102,7 @@ const AgendamentoModal = ({
           </div>
 
           <div className="form-group">
-            <label htmlFor="colaborador">Barbeiro:</label>
-            <select
-              id="colaborador"
-              value={formColaboradorId}
-              onChange={(e) => setFormColaboradorId(e.target.value)}
-              required
-              disabled={loading}
-            >
-              <option value="">Selecione um barbeiro</option>
-              {colaboradores.map((colab) => (
-                <option key={colab.id} value={colab.id}>
-                  {colab.nome}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="servicoCadastrado">Serviço Cadastrado:</label>
+            <label htmlFor="servicoCadastrado">Serviço:</label>
             <select
               id="servicoCadastrado"
               onChange={handleServicoChange}
@@ -134,28 +110,16 @@ const AgendamentoModal = ({
                 servicosCadastrados.find((s) => s.nome === formServicoNome)
                   ?.id || ""
               } // Seleciona o ID do serviço se o nome corresponder
+              required
               disabled={loading}
             >
-              <option value="">Selecione um serviço (opcional)</option>
+              <option value="">Selecione um serviço</option>
               {servicosCadastrados.map((serv) => (
                 <option key={serv.id} value={serv.id}>
                   {serv.nome} ({serv.duracao_minutos} min)
                 </option>
               ))}
             </select>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="servicoNome">Nome do Serviço (manual):</label>
-            <input
-              type="text"
-              id="servicoNome"
-              placeholder="Ex: Corte de Cabelo"
-              value={formServicoNome}
-              onChange={(e) => setFormServicoNome(e.target.value)}
-              required
-              disabled={loading}
-            />
           </div>
 
           <div className="form-group">

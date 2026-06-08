@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import './EditServicoModal.css'; // Importa o CSS para o modal
 
 const EditServicoModal = ({ servico, onSave, onCancel, loading }) => {
@@ -17,12 +18,12 @@ const EditServicoModal = ({ servico, onSave, onCancel, loading }) => {
         e.preventDefault(); // Previne o comportamento padrão do formulário
         // Validação básica antes de salvar
         if (!nome.trim()) {
-            alert('O nome do serviço não pode ser vazio.');
+            toast.warn('O nome do serviço não pode ser vazio.');
             return;
         }
         const valorNumerico = parseFloat(valorPadrao.replace(',', '.'));
         if (isNaN(valorNumerico) || valorNumerico <= 0) {
-            alert('O valor padrão deve ser um número positivo.');
+            toast.warn('O valor padrão deve ser um número positivo.');
             return;
         }
         onSave({
@@ -35,8 +36,9 @@ const EditServicoModal = ({ servico, onSave, onCancel, loading }) => {
     if (!servico) return null; // Não renderiza se não houver serviço para editar
     return (
         <div className="modal-backdrop">
-            <div className="modal-content">
-                <h2>Editar Serviço</h2> {/* Adicionado o form para o handleSubmit */}
+            {/* Envolve o conteúdo em um formulário e usa o evento onSubmit */}
+            <form className="modal-content" onSubmit={handleSave}>
+                <h2>Editar Serviço</h2>
                 <div className="form-group">
                     <label htmlFor="editNomeServico">Nome do Serviço:</label>
                     <input
@@ -45,6 +47,7 @@ const EditServicoModal = ({ servico, onSave, onCancel, loading }) => {
                         value={nome}
                         onChange={(e) => setNome(e.target.value)}
                         disabled={loading}
+                        required // Adiciona validação nativa do navegador
                     />
                 </div>
                 <div className="form-group">
@@ -53,29 +56,28 @@ const EditServicoModal = ({ servico, onSave, onCancel, loading }) => {
                         id="editValorServico"
                         type="number"
                         step="0.01"
+                        min="0.01" // Garante que o valor seja positivo
                         value={valorPadrao}
                         onChange={(e) => setValorPadrao(e.target.value)}
                         disabled={loading}
+                        required
                     />
                 </div>
-            
                 <div className="modal-actions">
+                    {/* O type="button" previne que o botão de cancelar envie o formulário */}
                     <button
+                        type="button"
                         className="button modal-cancel-button"
                         onClick={onCancel}
                         disabled={loading}
                     >
                         Cancelar
                     </button>
-                    <button
-                        className="button modal-save-button"
-                        onClick={handleSave} // Alterado para usar o handleSubmit do form
-                        disabled={loading}
-                    >
+                    <button type="submit" className="button modal-save-button" disabled={loading}>
                         {loading ? 'Salvando...' : 'Salvar'}
                     </button>
                 </div>
-            </div>
+            </form>
         </div>
     );
 };

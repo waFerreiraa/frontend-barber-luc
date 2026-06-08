@@ -2,11 +2,44 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
 :root {
+  /* Default Barbershop Theme (Dark) */
   --bg-color: #1a1a1a;
   --surface-color: #242424;
-  --primary-color: #ffffff; /* Dourado */
+  --primary-color: #ffffff; /* Branco/Dourado */
   --text-color: rgba(255, 255, 255, 0.87);
   --border-color: #444;
+  --input-bg-color: #333;
+  --button-text-color: #1a1a1a;
+  --button-hover-color: #c09b2d;
+  --cor-primaria: #ff9800;
+  --cor-secundaria: #222222;
+}
+
+body.theme-barbearia {
+  --bg-color: #1a1a1a;
+  --surface-color: #242424;
+  --primary-color: #ffffff;
+  --text-color: rgba(255, 255, 255, 0.87);
+  --border-color: #444;
+  --input-bg-color: #333;
+  --button-text-color: #1a1a1a;
+  --button-hover-color: #c09b2d;
+  --cor-primaria: #ff9800;
+  --cor-secundaria: #222222;
+}
+
+body.theme-salao {
+  /* Tema Salão de Mulher (Light/Neutro) */
+  --bg-color: #F7F4F1; /* Bege claro suave para fundo limpo */
+  --surface-color: #FFFFFF; /* Branco puro para os cards se destacarem */
+  --primary-color: #7A6B62; /* Bege amarronzado neutro elegante */
+  --text-color: #2F2A28; /* Cinza escuro para legibilidade */
+  --border-color: #DDD2CA; /* Bege claro suave para bordas */
+  --input-bg-color: #F2EFEA; /* Leve contraste nos inputs */
+  --button-text-color: #FFFFFF; /* Branco sobre botão neutro */
+  --button-hover-color: #6A5B52; /* Tom mais escuro para hover */
+  --cor-primaria: #7A6B62;
+  --cor-secundaria: #E2D7CF;
 }
 
 /* Reset básico */
@@ -67,7 +100,7 @@ input, select {
   padding: 0.75rem;
   border-radius: 4px;
   border: 1px solid var(--border-color);
-  background-color: #333;
+  background-color: var(--input-bg-color);
   color: var(--text-color);
   font-size: 1rem;
   box-sizing: border-box;
@@ -80,7 +113,7 @@ input:focus, select:focus {
 
 .button {
   background-color: var(--primary-color);
-  color: #1a1a1a;
+  color: var(--button-text-color);
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 4px;
@@ -91,7 +124,7 @@ input:focus, select:focus {
 }
 
 .button:hover {
-  background-color: #c09b2d;
+  background-color: var(--button-hover-color);
 }
 
 .button:disabled {

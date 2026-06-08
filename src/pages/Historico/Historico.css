@@ -1,0 +1,418 @@
+/* --- Filtros --- */
+.historico-filtros {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.historico-filtro-button {
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  color: var(--text-color);
+}
+
+.historico-filtro-button:hover {
+  background-color: rgba(255, 255, 255, 0.14);
+}
+
+.historico-filtro-button.active {
+  background-color: var(--cor-primaria);
+  color: var(--button-text-color);
+  border-color: transparent;
+}
+
+/* --- Lista com Scroll --- */
+.historico-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+/* --- Histórico: itens maiores e mais legíveis --- */
+.historico-item {
+  background-color: var(--surface-color);
+  padding: 1.4rem 1rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.16);
+}
+
+.historico-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+.historico-header-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.historico-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.historico-client {
+  font-weight: 700;
+  color: var(--text-color);
+  font-size: 1.1rem;
+}
+
+.historico-date {
+  font-size: 0.95rem;
+  color: var(--text-color);
+  opacity: 0.75;
+  margin-top: 0.3rem;
+}
+
+.historico-total {
+  font-size: 1.1rem;
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+.historico-details {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--bg-color);
+  border-left: 4px solid var(--cor-primaria);
+  border-radius: 10px;
+}
+
+.historico-details-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.historico-items-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.historico-item-detail {
+  font-size: 1rem;
+  padding: 0.4rem 0;
+  color: var(--text-color);
+  border-bottom: 1px dashed rgba(255,255,255,0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.historico-item-detail ul {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.historico-venda-individual {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  gap: 0.3rem;
+  padding: 0.6rem 0.4rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.historico-venda-individual:last-child {
+  border-bottom: none;
+}
+
+.historico-venda-linha-superior {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.historico-venda-linha-inferior {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.historico-venda-detalhes-pagamento {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.historico-venda-horario {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--cor-primaria);
+}
+
+.historico-venda-cliente-nome {
+  font-weight: 600;
+  color: var(--text-color);
+  font-size: 1rem;
+}
+
+.historico-venda-valor {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-color);
+}
+
+.historico-venda-pagamento {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background-color: rgba(255,255,255,0.08);
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: var(--text-color);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+/* Botão de excluir */
+.historico-delete-button {
+  background-color: transparent;
+  border: none;
+  color: #ff6b6b;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
+  min-width: 36px;
+  height: 36px;
+}
+.historico-delete-button:hover {
+  background-color: rgba(255,107,107,0.18);
+  color: #ff4d4f;
+}
+
+/* Modal */
+.historico-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.historico-modal {
+  background-color: var(--surface-color);
+  padding: 20px 30px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  color: var(--text-color);
+}
+
+.historico-modal-buttons {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.historico-modal-confirm {
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+
+.historico-modal-confirm:hover {
+  background-color: #d9363e;
+}
+
+.historico-modal-cancel {
+  background-color: transparent;
+  color: var(--text-color);
+  border: 1px solid rgba(255,255,255,0.3);
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.historico-modal-cancel:hover {
+  background-color: rgba(255,255,255,0.08);
+}
+
+.historico-sem-vendas {
+  text-align: center;
+  color: #999;
+  padding: 2rem;
+  font-style: italic;
+}
+
+/* --- Tema Salão --- */
+body.theme-salao .historico-filtro-button {
+  background-color: #fff;
+  color: #7A6B62;
+  border: 1px solid #DDD2CA;
+}
+
+body.theme-salao .historico-filtro-button:hover {
+  background-color: #F2EFEA;
+}
+
+body.theme-salao .historico-filtro-button.active {
+  background-color: #7A6B62;
+  color: white;
+}
+
+body.theme-salao .historico-item {
+  background-color: #ffffff;
+  border: 1px solid #DDD2CA;
+  box-shadow: 0 14px 30px rgba(122,107,98,0.08);
+}
+
+body.theme-salao .historico-item:hover {
+  box-shadow: 0 16px 34px rgba(122,107,98,0.12);
+}
+
+body.theme-salao .historico-details {
+  background: #F7F4F1;
+  border-left-color: #7A6B62;
+}
+
+body.theme-salao .historico-details-title {
+  color: #2D2D2D;
+}
+
+body.theme-salao .historico-item-detail,
+body.theme-salao .historico-venda-cliente-nome,
+body.theme-salao .historico-venda-horario,
+body.theme-salao .historico-total {
+  color: #2D2D2D;
+}
+
+body.theme-salao .historico-venda-valor {
+  color: #7A6B62;
+}
+
+body.theme-salao .historico-venda-pagamento {
+  background-color: #ffffff;
+  border: 1px solid #DDD2CA;
+}
+
+body.theme-salao .historico-modal {
+  background-color: #ffffff;
+  border: 1px solid #DDD2CA;
+}
+
+body.theme-salao .historico-modal-confirm {
+  background-color: #7A6B62;
+  color: white;
+}
+
+body.theme-salao .historico-modal-cancel {
+  background-color: #F2EFEA;
+  color: #2D2D2D;
+  border: 1px solid #DDD2CA;
+}
+
+body.theme-salao .historico-modal-cancel:hover {
+  background-color: #E2D7CF;
+}
+
+/* --- Ajustes Mobile --- */
+
+.historico-modal-cancel {
+  background-color: #ccc;
+  color: black;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+.historico-modal-cancel:hover {
+  background-color: #aaa;
+}
+
+.historico-sem-vendas {
+  text-align: center;
+  color: #666;
+  padding: 2rem;
+  font-style: italic;
+}
+
+
+/* --- Ajustes Mobile --- */
+@media (max-width: 600px) {
+  .historico-item {
+    padding: 1.6rem 1rem;
+  }
+
+  .historico-client {
+    font-size: 1.2rem;
+  }
+
+  .historico-date {
+    font-size: 0.9rem;
+  }
+
+  .historico-total {
+    font-size: 1.2rem;
+  }
+
+  .historico-details {
+    padding: 1.2rem;
+    border-left-width: 4px;
+  }
+
+  .historico-item-detail {
+    font-size: 1.05rem;
+    padding: 0.6rem 0;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .historico-delete-button {
+    padding: 8px 14px;
+    font-size: 0.95rem;
+    min-width: unset; /* Remove min-width para mobile se não for necessário */
+    margin-top: 5px;
+  }
+
+  .historico-modal-buttons {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
