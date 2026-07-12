@@ -44,6 +44,8 @@ const Dashboard = ({ token, usuario }) => {
           fetchHistorico(),
         ]);
 
+        console.log("DEBUG: dataSumario =", dataSumario);
+
         setSumario({
           faturamentoDia: dataSumario.faturamentoDia,
           faturamentoMes: dataSumario.faturamentoMes,
@@ -66,6 +68,8 @@ const Dashboard = ({ token, usuario }) => {
       } else {
         // Colaborador: busca apenas o sumário
         const dataSumario = await fetchSumario();
+
+        console.log("DEBUG: dataSumario =", dataSumario);
 
         setSumario({
           faturamentoDia: dataSumario.faturamentoDia,
