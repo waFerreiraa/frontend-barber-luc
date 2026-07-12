@@ -45,8 +45,8 @@ const Dashboard = ({ token, usuario }) => {
         ]);
 
         setSumario({
-          faturamentoDia: dataSumario.faturamento_dia,
-          faturamentoMes: dataSumario.faturamento_mes,
+          faturamentoDia: dataSumario.faturamentoDia,
+          faturamentoMes: dataSumario.faturamentoMes,
         });
 
         const hoje = new Date();
@@ -68,8 +68,8 @@ const Dashboard = ({ token, usuario }) => {
         const dataSumario = await fetchSumario();
 
         setSumario({
-          faturamentoDia: dataSumario.faturamento_dia,
-          faturamentoMes: dataSumario.faturamento_mes,
+          faturamentoDia: dataSumario.faturamentoDia,
+          faturamentoMes: dataSumario.faturamentoMes,
         });
       }
     } catch (err) {
@@ -165,7 +165,7 @@ const Dashboard = ({ token, usuario }) => {
                   <small>Total de vendas</small>
                 </div>
               </div>
-              <div className="dashboard-card-value">{formatCurrency(colaborador.valor_total)}</div>
+              <div className="dashboard-card-value">{formatCurrency(colaborador.valorTotal)}</div>
               <div className="dashboard-card-footer">
                 <small>📊 Base do sumário</small>
               </div>
