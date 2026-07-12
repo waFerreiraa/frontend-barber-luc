@@ -205,8 +205,9 @@
     color: #7A6B62;
 }
 .agenda-salao .agenda-central-logo img {
-    background-color: #7A6B62;
-    box-shadow: 0 14px 28px rgba(122,107,98,0.12);
+    background-color: #fff;
+    border: 2px solid rgba(214,51,132,0.25);
+    box-shadow: none;
 }
 .agenda-salao .button {
     background: var(--cor-primaria, #d63384);
@@ -308,4 +309,273 @@ body.theme-salao .agenda-main-card h3 {
         width: 100%;
         padding: 0.75rem;
     }
+}
+
+/* ===== NOVO LAYOUT DA AGENDA (calendário + lista) ===== */
+
+.agenda-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.agenda-top .agenda-central-logo {
+    margin-bottom: 0;
+}
+
+.agenda-novo-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--cor-primaria, #d63384);
+    color: #fff;
+}
+
+/* Grade de duas colunas: calendário | lista */
+.agenda-layout {
+    display: grid;
+    grid-template-columns: minmax(280px, 360px) 1fr;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.agenda-dia-titulo {
+    text-align: left !important;
+    text-transform: capitalize;
+    margin-bottom: 1rem !important;
+    font-size: 1.15rem;
+}
+
+.agenda-info {
+    color: var(--text-muted-color, #888);
+    font-style: italic;
+}
+
+/* Lista de cards do dia */
+.agenda-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.agenda-card {
+    display: flex;
+    align-items: stretch;
+    gap: 1rem;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 1rem;
+}
+
+.agenda-card-hora {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    min-width: 80px;
+    font-size: 0.95rem;
+}
+
+.agenda-card-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.agenda-card-cliente {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.agenda-card-servico {
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.agenda-card-barbeiro {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    color: var(--text-muted-color, #888);
+}
+
+.agenda-card-obs {
+    font-size: 0.85rem;
+    color: var(--text-muted-color, #888);
+    font-style: italic;
+}
+
+.agenda-card-lateral {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+/* Badge de status */
+.agenda-status {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    letter-spacing: 0.02em;
+}
+
+.status-agendado {
+    background-color: #6c757d33;
+    color: #6c757d;
+}
+
+.status-confirmado {
+    background-color: #28a74533;
+    color: #28a745;
+}
+
+.status-cancelado {
+    background-color: #dc354533;
+    color: #dc3545;
+}
+
+.status-concluido {
+    background-color: #007bff33;
+    color: #007bff;
+}
+
+.agenda-card-actions {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.agenda-icon-btn {
+    border: none;
+    background: var(--input-bg-color);
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-color);
+}
+
+.agenda-icon-btn.editar:hover {
+    background: var(--cor-primaria, #007bff);
+    color: #fff;
+}
+
+.agenda-icon-btn.excluir:hover {
+    background: #dc3545;
+    color: #fff;
+}
+
+/* Tema salão para os cards */
+body.theme-salao .agenda-card {
+    background-color: #fff;
+    border: 1px solid rgba(47,42,40,0.12);
+}
+
+body.theme-salao .agenda-dia-titulo {
+    color: #7A6B62;
+}
+
+/* Responsividade: empilha calendário e lista */
+@media (max-width: 768px) {
+    .agenda-layout {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .agenda-top {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .agenda-novo-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .agenda-card {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .agenda-card-lateral {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+}
+
+/* ===== AJUSTES DE LIMPEZA DO TEMA SALÃO ===== */
+
+/* Card principal mais leve, com sombra suave */
+body.theme-salao .agenda-main-card {
+    background-color: #ffffff;
+    box-shadow: 0 8px 24px rgba(122, 107, 98, 0.06);
+    border: 1px solid rgba(47, 42, 40, 0.06);
+}
+
+/* Cards de agendamento: sem borda dura, fundo creme suave e sombra leve */
+body.theme-salao .agenda-card {
+    background-color: #fffafc;
+    border: 1px solid rgba(214, 51, 132, 0.08);
+    box-shadow: 0 2px 8px rgba(122, 107, 98, 0.05);
+}
+
+/* Badges de status em tons pastéis que combinam com o salão */
+body.theme-salao .status-agendado {
+    background-color: #f0ebe8;
+    color: #7A6B62;
+}
+
+body.theme-salao .status-confirmado {
+    background-color: #e7f4ec;
+    color: #3f9d6a;
+}
+
+body.theme-salao .status-cancelado {
+    background-color: #fbe9ec;
+    color: #c96b7a;
+}
+
+body.theme-salao .status-concluido {
+    background-color: #fbeef5;
+    color: var(--cor-primaria, #d63384);
+}
+
+/* Botões de ação (editar/excluir) mais discretos */
+body.theme-salao .agenda-icon-btn {
+    background: #f7f1ee;
+    color: #7A6B62;
+}
+
+body.theme-salao .agenda-icon-btn.editar:hover {
+    background: var(--cor-primaria, #d63384);
+    color: #fff;
+}
+
+body.theme-salao .agenda-icon-btn.excluir:hover {
+    background: #c96b7a;
+    color: #fff;
+}
+
+/* Hora em tom da paleta, sem competir com o resto */
+body.theme-salao .agenda-card-hora {
+    color: var(--cor-primaria, #d63384);
 }

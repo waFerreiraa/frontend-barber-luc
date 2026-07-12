@@ -1,5 +1,5 @@
 // src/services/api.js
-const BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:10000";
+const BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:5118";
 
 // --- LOGOUT GLOBAL AUTOMÁTICO ---
 let globalLogout = null;
@@ -245,26 +245,98 @@ export const gerarRelatorioGanhos = async (mes, ano) => {
 
   const url = `${BASE_URL}/api/relatorio/ganhos?mes=${mes}&ano=${ano}`;
 
-  const response = await fetch(url, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  try {
+    const response = await fetch(url, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-  if (!response.ok) {
-    let msg = "Erro ao gerar PDF";
-    try {
-      const errorData = await response.json();
-      msg = errorData?.error || msg;
-    } catch (error) {
-      console.warn('Não foi possível ler o erro JSON do PDF', error);
+    if (!response.ok) {
+      let msg = "Erro ao gerar relatório";
+      try {
+        const errorData = await response.json();
+        msg = errorData?.error || msg;
+      } catch (error) {
+        console.warn('Não foi possível ler o erro JSON', error);
+      }
+      throw new Error(msg);
     }
-    throw new Error(msg);
-  }
 
-  const blob = await response.blob();
-  const link = document.createElement("a");
-  link.href = window.URL.createObjectURL(blob);
-  link.download = `Relatorio_Ganhos_${mes}_${ano}.pdf`;
-  link.click();
+    // Agora recebe JSON com os dados
+    const dados = await response.json();
+    
+    // Gerar PDF usando pdfkit (já tá instalado no frontend via npm)
+    // Se não tiver, usa uma solução alternativa
+    gerarPDFComDados(dados);
+  } catch (error) {
+    console.error("Erro ao gerar relatório:", error);
+    throw error;
+  }
+};
+
+// Função auxiliar para gerar PDF com os dados
+const gerarPDFComDados = (dados) => {
+  // Simples: criar um HTML e imprimir
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Relatório Ganhos</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 40px; }
+          h1 { text-align: center; }
+          h2 { text-align: center; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+          th { background-color: #f2f2f2; }
+          .total { text-align: right; font-weight: bold; margin-top: 20px; font-size: 16px; }
+        </style>
+      </head>
+      <body>
+        <h1>${dados.empresa_nome}</h1>
+        <h2>Relatório de Ganhos - ${String(dados.mes).padStart(2, '0')}/${dados.ano}</h2>
+        
+        ${dados.vendas.length === 0 ? 
+          '<p style="text-align: center;">Nenhuma venda encontrada para o período.</p>' :
+          `
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Data</th>
+                  <th>Cliente</th>
+                  <th>Colaborador</th>
+                  <th style="text-align: right;">Valor</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${dados.vendas.map(v => `
+                  <tr>
+                    <td>${v.numero}</td>
+                    <td>${v.data}</td>
+                    <td>${v.cliente}</td>
+                    <td>${v.colaborador}</td>
+                    <td style="text-align: right;">R$ ${v.valor.toFixed(2)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+            <div class="total">Total Geral: R$ ${dados.total_geral.toFixed(2)}</div>
+          `
+        }
+      </body>
+    </html>
+  `;
+
+  // Abrir em nova janela e imprimir como PDF
+  const novaJanela = window.open('', '_blank');
+  novaJanela.document.write(html);
+  novaJanela.document.close();
+  
+  // Trigger de impressão
+  setTimeout(() => {
+    novaJanela.print();
+  }, 250);
 };
 
 // --- LOGOUT ---

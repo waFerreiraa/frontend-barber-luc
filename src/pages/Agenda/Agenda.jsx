@@ -3,26 +3,37 @@ import {
   fetchAgendamentos,
   createAgendamento,
   updateAgendamento,
-  deleteAgendamento, // Mantém deleteAgendamento
-  fetchTiposServicos, // Adicionado para buscar serviços
+  deleteAgendamento,
+  fetchTiposServicos,
 } from "../../services/api";
 import { toast } from 'react-toastify';
-import "./Agenda.css"; // Vamos criar este CSS
-import Logo from "../../assets/penteado.png"; // Reutilizando seus assets
-import AgendamentoModal from "../Agendamento/AgendamentoModal"; // Importado para o topo
+import "./Agenda.css";
+import AgendamentoModal from "../Agendamento/AgendamentoModal";
+import Calendario from "./Calendario";
 import Lucao from "../../assets/LucaoLogo.png";
 import { ThemeContext } from "../../contexts/ThemeContext";
+import { FaPlus, FaEdit, FaTrash, FaClock, FaUser } from "react-icons/fa";
+
+// Gera uma chave "YYYY-MM-DD" a partir de uma data (no fuso local)
+const getDateKey = (date) => {
+  const ano = date.getFullYear();
+  const mes = String(date.getMonth() + 1).padStart(2, "0");
+  const dia = String(date.getDate()).padStart(2, "0");
+  return `${ano}-${mes}-${dia}`;
+};
 
 const Agenda = ({ usuario }) => {
   const { tema } = useContext(ThemeContext);
   const isSalao = tema === 'salao';
-  const emojiLateral = isSalao ? '💅' : '💈';
 
   // Estados para dados da API
   const [agendamentos, setAgendamentos] = useState([]);
-  const [servicosCadastrados, setServicosCadastrados] = useState([]); // Novo estado para serviços
+  const [servicosCadastrados, setServicosCadastrados] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showAgendamentoModal, setShowAgendamentoModal] = useState(false); // Estado para controlar o modal
+  const [showAgendamentoModal, setShowAgendamentoModal] = useState(false);
+
+  // Dia selecionado no calendário (começa em hoje)
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   // Estado para edição
   const [editingAgendamento, setEditingAgendamento] = useState(null);
@@ -32,10 +43,10 @@ const Agenda = ({ usuario }) => {
       setLoading(true);
       const [agendamentosData, servicosData] = await Promise.all([
         fetchAgendamentos(),
-        fetchTiposServicos(), // Busca os tipos de serviço
+        fetchTiposServicos(),
       ]);
       setAgendamentos(agendamentosData || []);
-      setServicosCadastrados(servicosData || []); // Define os serviços
+      setServicosCadastrados(servicosData || []);
     } catch (err) {
       toast.error(err.message || "Erro ao carregar dados da agenda.");
     } finally {
@@ -46,30 +57,24 @@ const Agenda = ({ usuario }) => {
   useEffect(() => {
     loadData();
   }, []);
-  
-  // Função para abrir o modal de novo agendamento
+
   const handleOpenNewAgendamentoModal = () => {
-    setEditingAgendamento(null); // Garante que é um novo agendamento
+    setEditingAgendamento(null);
     setShowAgendamentoModal(true);
   };
 
-  // Função para abrir o modal de edição
   const handleOpenEditModal = (agendamento) => {
     setEditingAgendamento(agendamento);
     setShowAgendamentoModal(true);
   };
 
-  // Função para fechar o modal
   const handleCloseModal = () => {
     setShowAgendamentoModal(false);
     setEditingAgendamento(null);
   };
 
-  // Função para salvar agendamento (usada pelo modal)
-  // O modal passa o ID do agendamento como primeiro argumento se for edição
   const handleSaveAgendamento = async (agendamentoId, agendamentoData) => {
-    setLoading(true); // Ativa loading global
-
+    setLoading(true);
     try {
       if (editingAgendamento) {
         await updateAgendamento(editingAgendamento.id, agendamentoData);
@@ -78,8 +83,8 @@ const Agenda = ({ usuario }) => {
         await createAgendamento(agendamentoData);
         toast.success("Agendamento criado com sucesso!");
       }
-      await loadData(); // Recarrega os agendamentos após salvar
-      handleCloseModal(); // Fecha o modal após sucesso
+      await loadData();
+      handleCloseModal();
     } catch (err) {
       toast.error(err.message || "Erro ao salvar agendamento.");
     } finally {
@@ -103,95 +108,144 @@ const Agenda = ({ usuario }) => {
     }
   };
 
-  const formatDateTime = (isoString) => {
-    const date = new Date(isoString);
-    return date.toLocaleString("pt-BR", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
+  // Mostra apenas a hora (HH:MM) do agendamento
+  const formatHora = (isoString) => {
+    return new Date(isoString).toLocaleTimeString("pt-BR", {
       hour: "2-digit",
       minute: "2-digit",
       timeZone: "America/Sao_Paulo",
     });
   };
 
-  const content = (
-    <>
-      <div className="agenda-header-controls">
-        <h2>Agenda de Horários</h2>
-        <button className="button" onClick={handleOpenNewAgendamentoModal}>
-          Novo Agendamento
-        </button>
-      </div>
+  // Título amigável do dia selecionado
+  const formatDiaSelecionado = (date) => {
+    return date.toLocaleDateString("pt-BR", {
+      weekday: "long",
+      day: "2-digit",
+      month: "long",
+    });
+  };
 
-      <h3>Próximos Agendamentos</h3>
-      {loading && <p>Carregando agendamentos...</p>}
-      {!loading && agendamentos.length === 0 && (
-        <p>Nenhum agendamento encontrado.</p>
-      )}
-      {!loading && agendamentos.length > 0 && (
-        <ul className="agenda-list">
-          {agendamentos.map((agendamento) => (
-            <li key={agendamento.id} className="agenda-item">
-              <div className="agenda-item-details">
-                <strong>Cliente:</strong> {agendamento.cliente_nome || "N/A"}
-                <br />
-                <strong>Barbeiro:</strong> {agendamento.usuarios?.nome || "N/A"}
-                <br />
-                <strong>Serviço:</strong> {agendamento.servico_nome || "N/A"} (
-                {agendamento.servico_duracao_minutos || 0} min)
-                <br />
-                <strong>Início:</strong> {formatDateTime(agendamento.data_hora_inicio)}
-                <br />
-                <strong>Fim:</strong> {formatDateTime(agendamento.data_hora_fim)}
-                <br />
-                <strong>Status:</strong> {agendamento.status}
-                {agendamento.observacoes && (
-                  <>
-                    <br />
-                    <strong>Obs:</strong> {agendamento.observacoes}
-                  </>
-                )}
-              </div>
-              <div className="agenda-item-actions">
-                <button
-                  className="button agenda-edit-button"
-                  onClick={() => handleOpenEditModal(agendamento)}
-                  disabled={loading}
-                >
-                  Editar
-                </button>
-                <button
-                  className="button agenda-delete-button"
-                  onClick={() => handleDelete(agendamento.id)}
-                  disabled={loading}
-                >
-                  Excluir
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-    </>
-  );
+  // Filtra os agendamentos do dia selecionado e ordena por horário
+  const selectedKey = getDateKey(selectedDate);
+  const agendamentosDoDia = agendamentos
+    .filter((ag) => getDateKey(new Date(ag.data_hora_inicio)) === selectedKey)
+    .sort(
+      (a, b) =>
+        new Date(a.data_hora_inicio) - new Date(b.data_hora_inicio),
+    );
+
+  // Cor de fundo do badge de status
+  const statusClass = (status) => {
+    switch (status) {
+      case "confirmado":
+        return "status-confirmado";
+      case "cancelado":
+        return "status-cancelado";
+      case "concluido":
+        return "status-concluido";
+      default:
+        return "status-agendado";
+    }
+  };
 
   return (
-    <div className="agenda-container">
+    <div className={`agenda-container ${isSalao ? "agenda-salao" : ""}`}>
       <main className="agenda-main-card">
-        <div className="agenda-top-visuals">
+        <div className="agenda-top">
           <div className="agenda-central-logo">
-            <img src={usuario?.configuracoes?.logo_url || Lucao} alt="Logo Central" />
+            <img src={usuario?.configuracoes?.logo_url || Lucao} alt="Logo" />
           </div>
+          <button className="button agenda-novo-btn" onClick={handleOpenNewAgendamentoModal}>
+            <FaPlus /> Novo Agendamento
+          </button>
         </div>
 
-        {content}
+        <div className="agenda-layout">
+          {/* Coluna esquerda: calendário */}
+          <div className="agenda-coluna-calendario">
+            <Calendario
+              agendamentos={agendamentos}
+              selectedDate={selectedDate}
+              onSelectDate={setSelectedDate}
+            />
+          </div>
+
+          {/* Coluna direita: agendamentos do dia */}
+          <div className="agenda-coluna-lista">
+            <h3 className="agenda-dia-titulo">
+              {formatDiaSelecionado(selectedDate)}
+            </h3>
+
+            {loading && <p className="agenda-info">Carregando...</p>}
+
+            {!loading && agendamentosDoDia.length === 0 && (
+              <p className="agenda-info">Nenhum agendamento neste dia.</p>
+            )}
+
+            {!loading && agendamentosDoDia.length > 0 && (
+              <ul className="agenda-list">
+                {agendamentosDoDia.map((agendamento) => (
+                  <li key={agendamento.id} className="agenda-card">
+                    <div className="agenda-card-hora">
+                      <FaClock /> {formatHora(agendamento.data_hora_inicio)}
+                    </div>
+                    <div className="agenda-card-info">
+                      <span className="agenda-card-cliente">
+                        {agendamento.cliente_nome || "Cliente"}
+                      </span>
+                      <span className="agenda-card-servico">
+                        {agendamento.servico_nome || "Serviço"}
+                        {agendamento.servico_duracao_minutos
+                          ? ` · ${agendamento.servico_duracao_minutos} min`
+                          : ""}
+                      </span>
+                      <span className="agenda-card-barbeiro">
+                        <FaUser /> {agendamento.usuarios?.nome || "N/A"}
+                      </span>
+                      {agendamento.observacoes && (
+                        <span className="agenda-card-obs">
+                          {agendamento.observacoes}
+                        </span>
+                      )}
+                    </div>
+                    <div className="agenda-card-lateral">
+                      <span
+                        className={`agenda-status ${statusClass(agendamento.status)}`}
+                      >
+                        {agendamento.status}
+                      </span>
+                      <div className="agenda-card-actions">
+                        <button
+                          className="agenda-icon-btn editar"
+                          onClick={() => handleOpenEditModal(agendamento)}
+                          disabled={loading}
+                          title="Editar"
+                        >
+                          <FaEdit />
+                        </button>
+                        <button
+                          className="agenda-icon-btn excluir"
+                          onClick={() => handleDelete(agendamento.id)}
+                          disabled={loading}
+                          title="Excluir"
+                        >
+                          <FaTrash />
+                        </button>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
       </main>
 
       {showAgendamentoModal && (
         <AgendamentoModal
           agendamentoToEdit={editingAgendamento}
-          servicosCadastrados={servicosCadastrados} // Passar os serviços cadastrados
+          servicosCadastrados={servicosCadastrados}
           onSave={handleSaveAgendamento}
           onCancel={handleCloseModal}
           loading={loading}
@@ -200,4 +254,5 @@ const Agenda = ({ usuario }) => {
     </div>
   );
 };
+
 export default Agenda;

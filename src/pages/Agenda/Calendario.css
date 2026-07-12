@@ -1,0 +1,141 @@
+/* Calendário customizado */
+.calendario {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.calendario-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.calendario-titulo {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--primary-color);
+    text-transform: capitalize;
+}
+
+.calendario-nav {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--primary-color);
+    font-size: 1rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendario-nav:hover {
+    background-color: var(--input-bg-color);
+}
+
+.calendario-grade {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.calendario-dias-semana {
+    margin-bottom: 6px;
+}
+
+.calendario-dia-semana {
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted-color, #888);
+    padding: 0.25rem 0;
+}
+
+.calendario-celula {
+    position: relative;
+    aspect-ratio: 1;
+    border: none;
+    background: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+    font-size: 0.9rem;
+    transition: background-color 0.15s ease;
+}
+
+.calendario-celula.vazia {
+    cursor: default;
+}
+
+.calendario-celula:not(.vazia):hover {
+    background-color: var(--input-bg-color);
+}
+
+.calendario-celula.hoje .calendario-numero {
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.calendario-celula.selecionado {
+    background-color: var(--cor-primaria, #d63384);
+}
+
+.calendario-celula.selecionado .calendario-numero {
+    color: #fff;
+    font-weight: 700;
+}
+
+.calendario-marcador {
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: var(--cor-primaria, #d63384);
+}
+
+.calendario-celula.selecionado .calendario-marcador {
+    background-color: #fff;
+}
+
+/* Tema salão */
+body.theme-salao .calendario {
+    background-color: #fff;
+    border: 1px solid rgba(47,42,40,0.12);
+}
+
+body.theme-salao .calendario-titulo {
+    color: #7A6B62;
+}
+
+body.theme-salao .calendario-nav {
+    color: var(--cor-primaria, #d63384);
+}
+
+/* Ajustes de limpeza do tema salão */
+body.theme-salao .calendario {
+    box-shadow: 0 2px 8px rgba(122, 107, 98, 0.05);
+}
+
+body.theme-salao .calendario-celula:not(.vazia):hover {
+    background-color: #fbeef5;
+}
+
+body.theme-salao .calendario-celula.hoje .calendario-numero {
+    color: var(--cor-primaria, #d63384);
+}
+
+body.theme-salao .calendario-dia-semana {
+    color: #b3a39b;
+}
