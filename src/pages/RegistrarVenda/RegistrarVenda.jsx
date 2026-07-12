@@ -33,8 +33,10 @@ const RegistrarVenda = ({ usuario }) => {
 
   const loadData = async () => {
     try {
-      const clientesData = await fetchClientes();
-      const servicosData = await fetchTiposServicos();
+      const [clientesData, servicosData] = await Promise.all([
+        fetchClientes(),
+        fetchTiposServicos(),
+      ]);
       setClientes(clientesData);
       setServicos(servicosData);
     } catch (err) {

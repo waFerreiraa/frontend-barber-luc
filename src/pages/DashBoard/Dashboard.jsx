@@ -4,7 +4,7 @@ import Lucao from "../../assets/LucaoLogo.png";
 import React, { useState, useEffect, useContext } from "react";
 import { FaCalendarDay, FaCalendarAlt, FaChartLine } from "react-icons/fa";
 import "./Dashboard.css";
-import { fetchHistorico, gerarRelatorioGanhos } from "../../services/api";
+import { fetchSumario, fetchHistorico, gerarRelatorioGanhos } from "../../services/api";
 import { ThemeContext } from "../../contexts/ThemeContext";
 
 const Dashboard = ({ token, usuario }) => {
@@ -37,41 +37,41 @@ const Dashboard = ({ token, usuario }) => {
       setLoading(true);
       setError("");
 
-      const dataHistorico = await fetchHistorico(token);
+      if (usuario.tipo_usuario === "admin") {
+        // Admin: busca sumário e histórico em paralelo
+        const [dataSumario, dataHistorico] = await Promise.all([
+          fetchSumario(),
+          fetchHistorico(),
+        ]);
 
-      const minhasVendas = dataHistorico.filter(
-        (v) => v.usuario_id === usuario.id
-      );
+        setSumario({
+          faturamentoDia: dataSumario.faturamento_dia,
+          faturamentoMes: dataSumario.faturamento_mes,
+        });
 
-      const hoje = new Date();
-      const mes = hoje.getMonth();
-      const ano = hoje.getFullYear();
+        const hoje = new Date();
+        const mes = hoje.getMonth();
+        const ano = hoje.getFullYear();
 
-      // 🔹 filtra apenas vendas do mês e ano atuais dos colaboradores
-      const colaboradorVendas = dataHistorico.filter((v) => {
-        const dataVenda = new Date(v.data_venda);
-        return (
-          v.usuario_id !== usuario.id &&
-          dataVenda.getMonth() === mes &&
-          dataVenda.getFullYear() === ano
-        );
-      });
+        const colaboradorVendas = dataHistorico.filter((v) => {
+          const dataVenda = new Date(v.data_venda);
+          return (
+            v.usuario_id !== usuario.id &&
+            dataVenda.getMonth() === mes &&
+            dataVenda.getFullYear() === ano
+          );
+        });
 
-      const faturamentoDia = minhasVendas
-        .filter(
-          (v) => new Date(v.data_venda).toDateString() === hoje.toDateString()
-        )
-        .reduce((acc, v) => acc + Number(v.valor_total || 0), 0);
+        setVendasColaboradores(colaboradorVendas);
+      } else {
+        // Colaborador: busca apenas o sumário
+        const dataSumario = await fetchSumario();
 
-      const faturamentoMes = minhasVendas
-        .filter((v) => {
-          const data = new Date(v.data_venda);
-          return data.getMonth() === mes && data.getFullYear() === ano;
-        })
-        .reduce((acc, v) => acc + Number(v.valor_total || 0), 0);
-
-      setSumario({ faturamentoDia, faturamentoMes });
-      setVendasColaboradores(colaboradorVendas);
+        setSumario({
+          faturamentoDia: dataSumario.faturamento_dia,
+          faturamentoMes: dataSumario.faturamento_mes,
+        });
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -148,43 +148,29 @@ const Dashboard = ({ token, usuario }) => {
     if (usuario.tipo_usuario !== "admin" || vendasColaboradores.length === 0)
       return null;
 
-    const colaboradores = Object.entries(
-      vendasColaboradores.reduce((acc, v) => {
-        const nome = v.usuario_nome || "Colaborador";
-        if (!acc[nome]) acc[nome] = [];
-        acc[nome].push(v);
-        return acc;
-      }, {})
-    );
-
+    // Os colaboradores já vêm agrupados do backend
     return (
       <div className="dashboard-collaborators">
         <h4>💼 Faturamento por Colaborador</h4>
         <div className="dashboard-collaborators-grid">
-          {colaboradores.map(([nomeColaborador, vendas]) => {
-            const total = vendas.reduce(
-              (acc, v) => acc + Number(v.valor_total || 0),
-              0
-            );
-            return (
-              <div
-                key={nomeColaborador}
-                className="dashboard-collaborator-card"
-              >
-                <div className="dashboard-card-header">
-                  <div className="dashboard-card-icon">👤</div>
-                  <div className="dashboard-card-title">
-                    <h4>{nomeColaborador}</h4>
-                    <small>Total de vendas</small>
-                  </div>
-                </div>
-                <div className="dashboard-card-value">{formatCurrency(total)}</div>
-                <div className="dashboard-card-footer">
-                  <small>📊 Base do histórico</small>
+          {vendasColaboradores.map((colaborador) => (
+            <div
+              key={colaborador.usuario_nome}
+              className="dashboard-collaborator-card"
+            >
+              <div className="dashboard-card-header">
+                <div className="dashboard-card-icon">👤</div>
+                <div className="dashboard-card-title">
+                  <h4>{colaborador.usuario_nome}</h4>
+                  <small>Total de vendas</small>
                 </div>
               </div>
-            );
-          })}
+              <div className="dashboard-card-value">{formatCurrency(colaborador.valor_total)}</div>
+              <div className="dashboard-card-footer">
+                <small>📊 Base do sumário</small>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );

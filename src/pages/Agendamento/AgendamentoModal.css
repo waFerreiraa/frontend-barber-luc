@@ -141,3 +141,65 @@ body.theme-salao .agendamento-modal-content .agenda-form textarea:focus {
         width: 100%; /* Botões ocupam a largura total */
     }
 }
+
+/* Seletor de serviço (dropdown + botão Adicionar lado a lado) */
+.agendamento-modal-content .agenda-servico-add {
+    display: flex;
+    gap: 0.5rem;
+    align-items: stretch;
+}
+
+.agendamento-modal-content .agenda-servico-add select {
+    flex: 1;
+}
+
+.agendamento-modal-content .agenda-servico-add .button {
+    white-space: nowrap;
+}
+
+/* Texto quando não há serviços adicionados */
+.agendamento-modal-content .agenda-servicos-vazio {
+    color: var(--text-muted-color, #888);
+    font-style: italic;
+    margin: 0;
+}
+
+/* Lista de serviços adicionados */
+.agendamento-modal-content .agenda-servicos-lista {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.agendamento-modal-content .agenda-servico-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0.75rem;
+    border-radius: 4px;
+    background-color: var(--input-bg-color);
+    border: 1px solid var(--border-color);
+}
+
+.agendamento-modal-content .agenda-servico-remove {
+    background: none;
+    border: none;
+    color: #dc3545;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 0.25rem;
+}
+
+.agendamento-modal-content .agenda-servico-remove:hover {
+    color: #a71d2a;
+}
+
+body.theme-salao .agendamento-modal-content .agenda-servico-item {
+    background-color: #fff;
+    color: #2F2A28;
+    border: 1px solid rgba(47,42,40,0.12);
+}
