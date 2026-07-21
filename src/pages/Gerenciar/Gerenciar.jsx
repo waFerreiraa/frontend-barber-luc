@@ -9,7 +9,6 @@ import {
     createCollaborator,
 } from '../../services/api';
 import Logo from "../../assets/penteado.png";
-import Cabelo from "../../assets/mulher.png";
 import Lucao from "../../assets/LucaoLogo.png";
 import EditServicoModal from './EditServicoModal'; // Importar o novo modal
 import DeleteConfirmationModal from './DeleteConfirmationModal'; // Importar o novo modal
