@@ -5,6 +5,8 @@ import {
   updateAgendamento,
   deleteAgendamento,
   fetchTiposServicos,
+  fetchClientes,
+  createVenda,
 } from "../../services/api";
 import { toast } from 'react-toastify';
 import "./Agenda.css";
@@ -29,8 +31,15 @@ const Agenda = ({ usuario }) => {
   // Estados para dados da API
   const [agendamentos, setAgendamentos] = useState([]);
   const [servicosCadastrados, setServicosCadastrados] = useState([]);
+  const [clientesCadastrados, setClientesCadastrados] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAgendamentoModal, setShowAgendamentoModal] = useState(false);
+
+  // Estados para modal de venda do agendamento concluído
+  const [showVendaModal, setShowVendaModal] = useState(false);
+  const [agendamentoPendente, setAgendamentoPendente] = useState(null);
+  const [valorVenda, setValorVenda] = useState("");
+  const [formaPagamento, setFormaPagamento] = useState("");
 
   // Dia selecionado no calendário (começa em hoje)
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -41,12 +50,14 @@ const Agenda = ({ usuario }) => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [agendamentosData, servicosData] = await Promise.all([
+      const [agendamentosData, servicosData, clientesData] = await Promise.all([
         fetchAgendamentos(),
         fetchTiposServicos(),
+        fetchClientes(),
       ]);
       setAgendamentos(agendamentosData || []);
       setServicosCadastrados(servicosData || []);
+      setClientesCadastrados(clientesData || []);
     } catch (err) {
       toast.error(err.message || "Erro ao carregar dados da agenda.");
     } finally {
@@ -76,15 +87,34 @@ const Agenda = ({ usuario }) => {
   const handleSaveAgendamento = async (agendamentoId, agendamentoData) => {
     setLoading(true);
     try {
-      if (editingAgendamento) {
+      // Se está mudando para "concluido" e o agendamento anterior não era concluido
+      const estaFicandoConcluido = 
+        agendamentoData.status === "concluido" &&
+        editingAgendamento &&
+        editingAgendamento.status !== "concluido";
+
+      if (estaFicandoConcluido) {
+        // Salva o agendamento primeiro
         await updateAgendamento(editingAgendamento.id, agendamentoData);
-        toast.success("Agendamento atualizado com sucesso!");
+        
+        // Depois abre o modal de venda
+        setAgendamentoPendente(editingAgendamento);
+        setValorVenda("");
+        setFormaPagamento("");
+        setShowVendaModal(true);
+        handleCloseModal();
+        await loadData();
       } else {
-        await createAgendamento(agendamentoData);
-        toast.success("Agendamento criado com sucesso!");
+        if (editingAgendamento) {
+          await updateAgendamento(editingAgendamento.id, agendamentoData);
+          toast.success("Agendamento atualizado com sucesso!");
+        } else {
+          await createAgendamento(agendamentoData);
+          toast.success("Agendamento criado com sucesso!");
+        }
+        await loadData();
+        handleCloseModal();
       }
-      await loadData();
-      handleCloseModal();
     } catch (err) {
       toast.error(err.message || "Erro ao salvar agendamento.");
     } finally {
@@ -106,6 +136,66 @@ const Agenda = ({ usuario }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Fechar modal de venda
+  const handleCloseVendaModal = () => {
+    setShowVendaModal(false);
+    setAgendamentoPendente(null);
+    setValorVenda("");
+    setFormaPagamento("");
+  };
+
+  // Registrar venda do agendamento concluído
+  const handleRegistrarVendaDoAgendamento = async () => {
+    if (!valorVenda || !formaPagamento) {
+      toast.warn("Preencha o valor e a forma de pagamento.");
+      return;
+    }
+
+    if (!agendamentoPendente) return;
+
+    try {
+      setLoading(true);
+
+      // Encontrar o cliente pelos dados do agendamento
+      const cliente = clientesCadastrados.find(
+        (c) => c.nome.toLowerCase() === agendamentoPendente.cliente_nome.toLowerCase()
+      );
+
+      if (!cliente) {
+        toast.error("Cliente do agendamento não encontrado.");
+        return;
+      }
+
+      // Criar a venda com os dados do agendamento
+      const vendaData = {
+        cliente_id: cliente.id,
+        valor_total: parseFloat(valorVenda),
+        itens: [
+          {
+            servico_id: servicosCadastrados[0]?.id || 1, // Usa o primeiro serviço como padrão
+            valor_cobrado: parseFloat(valorVenda),
+          },
+        ],
+        forma_pagamento: formaPagamento,
+      };
+
+      await createVenda(vendaData);
+      toast.success("Venda registrada com sucesso!");
+      handleCloseVendaModal();
+      await loadData();
+    } catch (err) {
+      toast.error(err.message || "Erro ao registrar venda.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Pular o registro de venda (só marca como concluído)
+  const handlePularRegistroVenda = () => {
+    handleCloseVendaModal();
+    toast.info("Agendamento marcado como concluído sem registrar venda.");
   };
 
   // Mostra apenas a hora (HH:MM) do agendamento
@@ -250,6 +340,77 @@ const Agenda = ({ usuario }) => {
           onCancel={handleCloseModal}
           loading={loading}
         />
+      )}
+
+      {/* Modal para registrar venda do agendamento concluído */}
+      {showVendaModal && agendamentoPendente && (
+        <div className="modal-backdrop">
+          <div className="modal-content">
+            <h2>Registrar Venda - {agendamentoPendente.cliente_nome}</h2>
+            <p className="modal-info">
+              <strong>Serviço:</strong> {agendamentoPendente.servico_nome}
+            </p>
+            <p className="modal-info">
+              <strong>Duração:</strong> {agendamentoPendente.servico_duracao_minutos} minutos
+            </p>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleRegistrarVendaDoAgendamento();
+              }}
+            >
+              <div className="form-group">
+                <label htmlFor="valorVenda">Valor da Venda:</label>
+                <input
+                  type="number"
+                  id="valorVenda"
+                  step="0.01"
+                  value={valorVenda}
+                  onChange={(e) => setValorVenda(e.target.value)}
+                  placeholder="Ex: 50.00"
+                  required
+                  disabled={loading}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="pagamentoVenda">Forma de Pagamento:</label>
+                <select
+                  id="pagamentoVenda"
+                  value={formaPagamento}
+                  onChange={(e) => setFormaPagamento(e.target.value)}
+                  required
+                  disabled={loading}
+                >
+                  <option value="">Selecione...</option>
+                  <option value="Pix">Pix</option>
+                  <option value="Dinheiro">Dinheiro</option>
+                  <option value="Credito">Crédito</option>
+                  <option value="Debito">Débito</option>
+                </select>
+              </div>
+
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  className="button modal-cancel-button"
+                  onClick={handlePularRegistroVenda}
+                  disabled={loading}
+                >
+                  Pular
+                </button>
+                <button
+                  type="submit"
+                  className="button"
+                  disabled={loading}
+                >
+                  {loading ? "Registrando..." : "Registrar Venda"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );
