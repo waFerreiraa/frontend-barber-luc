@@ -152,26 +152,36 @@ const Dashboard = ({ token, usuario }) => {
     if (usuario.tipo_usuario !== "admin" || vendasColaboradores.length === 0)
       return null;
 
-    // Os colaboradores já vêm agrupados do backend
+    // Agrupar colaboradores e calcular totais
+    const colaboradoresAgrupados = vendasColaboradores.reduce((acc, venda) => {
+      const nomeColab = venda.usuario_nome || "Sem nome";
+      if (!acc[nomeColab]) {
+        acc[nomeColab] = { nome: nomeColab, total: 0, vendas: 0 };
+      }
+      acc[nomeColab].total += Number(venda.valor_total || 0);
+      acc[nomeColab].vendas += 1;
+      return acc;
+    }, {});
+
     return (
       <div className="dashboard-collaborators">
         <h4>💼 Faturamento por Colaborador</h4>
         <div className="dashboard-collaborators-grid">
-          {vendasColaboradores.map((colaborador) => (
+          {Object.values(colaboradoresAgrupados).map((colaborador) => (
             <div
-              key={colaborador.usuario_nome}
+              key={colaborador.nome}
               className="dashboard-collaborator-card"
             >
               <div className="dashboard-card-header">
                 <div className="dashboard-card-icon">👤</div>
                 <div className="dashboard-card-title">
-                  <h4>{colaborador.usuario_nome}</h4>
-                  <small>Total de vendas</small>
+                  <h4>{colaborador.nome}</h4>
+                  <small>{colaborador.vendas} venda{colaborador.vendas !== 1 ? 's' : ''}</small>
                 </div>
               </div>
-              <div className="dashboard-card-value">{formatCurrency(colaborador.valor_total)}</div>
+              <div className="dashboard-card-value">{formatCurrency(colaborador.total)}</div>
               <div className="dashboard-card-footer">
-                <small>📊 Base do sumário</small>
+                <small>📊 Total do mês</small>
               </div>
             </div>
           ))}
