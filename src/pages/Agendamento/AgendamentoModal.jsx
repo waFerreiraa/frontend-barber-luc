@@ -1,9 +1,30 @@
 import React, { useState, useEffect } from "react";
 import "./AgendamentoModal.css"; // CSS para o modal
 
+const formatDateTimeForInput = (isoString) => {
+  const data = new Date(isoString);
+  if (Number.isNaN(data.getTime())) return "";
+
+  const partes = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Sao_Paulo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(data).reduce((resultado, parte) => {
+    if (parte.type !== "literal") resultado[parte.type] = parte.value;
+    return resultado;
+  }, {});
+
+  return `${partes.year}-${partes.month}-${partes.day}T${partes.hour}:${partes.minute}`;
+};
+
 const AgendamentoModal = ({
   agendamentoToEdit,
   servicosCadastrados, // Lista de tipos_servicos
+  isSalao,
   onSave,
   onCancel,
   loading,
@@ -20,6 +41,33 @@ const AgendamentoModal = ({
 
   const statusOptions = ["agendado", "confirmado", "cancelado", "concluido"];
 
+  const duracaoTotalSalao = servicosSelecionados.reduce((total, nomeServico) => {
+    const servico = servicosCadastrados.find(
+      (item) => item.nome.toLowerCase() === nomeServico.toLowerCase(),
+    );
+    return total + Number(servico?.duracao_minutos || 0);
+  }, 0);
+
+  useEffect(() => {
+    if (isSalao) {
+      setFormServicoDuracao(duracaoTotalSalao ? String(duracaoTotalSalao) : "");
+    }
+  }, [isSalao, duracaoTotalSalao]);
+
+  const horarioTermino = (() => {
+    if (!isSalao || !formDataHoraInicio || !formServicoDuracao) return null;
+
+    const inicio = new Date(formDataHoraInicio);
+    const duracao = Number(formServicoDuracao);
+    if (Number.isNaN(inicio.getTime()) || !Number.isFinite(duracao)) return null;
+
+    inicio.setMinutes(inicio.getMinutes() + duracao);
+    return inicio.toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  })();
+
   useEffect(() => {
     if (agendamentoToEdit) {
       setFormClienteNome(agendamentoToEdit.cliente_nome || "");
@@ -31,7 +79,7 @@ const AgendamentoModal = ({
       setServicosSelecionados(nomes);
       setFormServicoDuracao(agendamentoToEdit.servico_duracao_minutos || "");
       setFormDataHoraInicio(
-        new Date(agendamentoToEdit.data_hora_inicio).toISOString().slice(0, 16),
+        formatDateTimeForInput(agendamentoToEdit.data_hora_inicio),
       );
       setFormStatus(agendamentoToEdit.status || "agendado"); // Preenche o status
       setFormObservacoes(agendamentoToEdit.observacoes || "");
@@ -88,6 +136,11 @@ const AgendamentoModal = ({
     const agendamentoData = {
       cliente_nome: formClienteNome,
       servico_nome: servicosSelecionados.join(", "), // Junta os serviços: "Unha, Cabelo"
+      servico_ids: isSalao
+        ? servicosSelecionados
+            .map((nome) => servicosCadastrados.find((servico) => servico.nome === nome)?.id)
+            .filter(Boolean)
+        : undefined,
       servico_duracao_minutos: Number(formServicoDuracao),
       data_hora_inicio: formDataHoraInicio,
       status: formStatus,
@@ -192,6 +245,11 @@ const AgendamentoModal = ({
               required
               disabled={loading}
             />
+            {isSalao && horarioTermino && (
+              <p className="agenda-horario-termino">
+                ⏱️ Previsão de término: <strong>{horarioTermino}</strong>
+              </p>
+            )}
           </div>
 
           <div className="form-group">

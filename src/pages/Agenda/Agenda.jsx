@@ -6,6 +6,7 @@ import {
   deleteAgendamento,
   fetchTiposServicos,
   fetchClientes,
+  createCliente,
   createVenda,
 } from "../../services/api";
 import { toast } from 'react-toastify';
@@ -97,15 +98,24 @@ const Agenda = ({ usuario }) => {
         // Salva o agendamento primeiro
         await updateAgendamento(editingAgendamento.id, agendamentoData);
         
-        // Buscar o valor do serviço nos servicosCadastrados
-        const servicoEncontrado = servicosCadastrados.find(
-          (s) => s.nome.toLowerCase() === editingAgendamento.servico_nome.toLowerCase()
-        );
-        const valorServico = servicoEncontrado?.valor_padrao || "";
+        // Buscar o valor total dos serviços
+        // servico_nome vem como "Unha, Cabelo" -> precisa somar todos
+        const agendamentoAtualizado = { ...editingAgendamento, ...agendamentoData };
+        const nomesServicos = (agendamentoAtualizado.servico_nome || "")
+          .split(",")
+          .map((n) => n.trim())
+          .filter((n) => n.length > 0);
         
-        // Depois abre o modal de venda com o valor do serviço preenchido
-        setAgendamentoPendente(editingAgendamento);
-        setValorVenda(valorServico.toString());
+        const valorTotal = nomesServicos.reduce((soma, nomeServico) => {
+          const servicoEncontrado = servicosCadastrados.find(
+            (s) => s.nome.toLowerCase() === nomeServico.toLowerCase()
+          );
+          return soma + (servicoEncontrado?.valor_padrao || 0);
+        }, 0);
+        
+        // Abre o modal de venda com o valor total dos serviços
+        setAgendamentoPendente(agendamentoAtualizado);
+        setValorVenda(valorTotal.toString());
         setFormaPagamento("");
         setShowVendaModal(true);
         handleCloseModal();
@@ -164,26 +174,46 @@ const Agenda = ({ usuario }) => {
     try {
       setLoading(true);
 
-      // Encontrar o cliente pelos dados do agendamento
-      const cliente = clientesCadastrados.find(
-        (c) => c.nome.toLowerCase() === agendamentoPendente.cliente_nome.toLowerCase()
+      // Usa o cliente informado no agendamento. Se ele ainda não estiver
+      // cadastrado, cria o cadastro automaticamente antes de registrar a venda.
+      const nomeCliente = agendamentoPendente.cliente_nome?.trim();
+      if (!nomeCliente) {
+        throw new Error("O agendamento não possui nome de cliente.");
+      }
+
+      let cliente = clientesCadastrados.find(
+        (item) => item.nome?.trim().toLowerCase() === nomeCliente.toLowerCase()
       );
 
       if (!cliente) {
-        toast.error("Cliente do agendamento não encontrado.");
-        return;
+        cliente = await createCliente({ nome: nomeCliente, telefone: "" });
+        setClientesCadastrados((clientes) => [...clientes, cliente]);
       }
 
-      // Criar a venda com os dados do agendamento
+      const nomesServicos = (agendamentoPendente.servico_nome || "")
+        .split(",")
+        .map((nome) => nome.trim())
+        .filter(Boolean);
+
+      const itens = nomesServicos.map((nomeServico) => {
+        const servico = servicosCadastrados.find(
+          (item) => item.nome.toLowerCase() === nomeServico.toLowerCase()
+        );
+
+        if (!servico) {
+          throw new Error(`Serviço "${nomeServico}" não encontrado.`);
+        }
+
+        return {
+          servico_id: servico.id,
+          valor_cobrado: Number(servico.valor_padrao),
+        };
+      });
+
       const vendaData = {
         cliente_id: cliente.id,
-        valor_total: parseFloat(valorVenda),
-        itens: [
-          {
-            servico_id: servicosCadastrados[0]?.id || 1, // Usa o primeiro serviço como padrão
-            valor_cobrado: parseFloat(valorVenda),
-          },
-        ],
+        valor_total: Number(valorVenda),
+        itens,
         forma_pagamento: formaPagamento,
       };
 
@@ -202,6 +232,17 @@ const Agenda = ({ usuario }) => {
   const handlePularRegistroVenda = () => {
     handleCloseVendaModal();
     toast.info("Agendamento marcado como concluído sem registrar venda.");
+  };
+
+  const formatDuracao = (duracaoEmMinutos) => {
+    const minutos = Number(duracaoEmMinutos);
+    if (!Number.isFinite(minutos) || minutos <= 0) return "";
+
+    if (minutos < 60) return `${minutos} min`;
+
+    const horas = Math.floor(minutos / 60);
+    const minutosRestantes = String(minutos % 60).padStart(2, "0");
+    return `${horas}:${minutosRestantes}h`;
   };
 
   // Mostra apenas a hora (HH:MM) do agendamento
@@ -285,6 +326,9 @@ const Agenda = ({ usuario }) => {
                   <li key={agendamento.id} className="agenda-card">
                     <div className="agenda-card-hora">
                       <FaClock /> {formatHora(agendamento.data_hora_inicio)}
+                      {isSalao && agendamento.data_hora_fim
+                        ? ` às ${formatHora(agendamento.data_hora_fim)}`
+                        : ""}
                     </div>
                     <div className="agenda-card-info">
                       <span className="agenda-card-cliente">
@@ -293,7 +337,7 @@ const Agenda = ({ usuario }) => {
                       <span className="agenda-card-servico">
                         {agendamento.servico_nome || "Serviço"}
                         {agendamento.servico_duracao_minutos
-                          ? ` · ${agendamento.servico_duracao_minutos} min`
+                          ? ` · ${formatDuracao(agendamento.servico_duracao_minutos)}`
                           : ""}
                       </span>
                       <span className="agenda-card-barbeiro">
@@ -342,6 +386,7 @@ const Agenda = ({ usuario }) => {
         <AgendamentoModal
           agendamentoToEdit={editingAgendamento}
           servicosCadastrados={servicosCadastrados}
+          isSalao={isSalao}
           onSave={handleSaveAgendamento}
           onCancel={handleCloseModal}
           loading={loading}
@@ -357,7 +402,7 @@ const Agenda = ({ usuario }) => {
               <strong>Serviço:</strong> {agendamentoPendente.servico_nome}
             </p>
             <p className="modal-info">
-              <strong>Duração:</strong> {agendamentoPendente.servico_duracao_minutos} minutos
+              <strong>Duração:</strong> {formatDuracao(agendamentoPendente.servico_duracao_minutos)}
             </p>
 
             <form

@@ -23,6 +23,7 @@ const Gerenciar = ({ usuario }) => {
     const [servicos, setServicos] = useState([]);
     const [nomeServico, setNomeServico] = useState('');
     const [valorServico, setValorServico] = useState('');
+    const [duracaoServico, setDuracaoServico] = useState('');
 
     // Estados para criação de usuário (apenas para 'dono')
     const [novoUsuario, setNovoUsuario] = useState({
@@ -72,9 +73,14 @@ const Gerenciar = ({ usuario }) => {
         e.preventDefault();
         setLoading(true);
         try {
-            await createTipoServico({ nome: nomeServico, valor_padrao: valorServico });
+            const servico = {
+                nome: nomeServico,
+                valor_padrao: valorServico,
+                ...(isSalao && { duracao_minutos: Number(duracaoServico) }),
+            };
+            await createTipoServico(servico);
             toast.success('Serviço adicionado!');
-            setNomeServico(''); setValorServico('');
+            setNomeServico(''); setValorServico(''); setDuracaoServico('');
             setVisibleForm(null); // Fecha o formulário
             loadData(); // Recarrega a lista
         } catch (err) {
@@ -334,6 +340,12 @@ const Gerenciar = ({ usuario }) => {
                                 <label>Valor Padrão (ex: 25.00)</label>
                                 <input type="number" step="0.01" value={valorServico} onChange={e => setValorServico(e.target.value)} required disabled={loading} />
                             </div>
+                            {isSalao && (
+                                <div className="form-group">
+                                    <label>Duração (minutos)</label>
+                                    <input type="number" min="1" step="1" value={duracaoServico} onChange={e => setDuracaoServico(e.target.value)} required disabled={loading} />
+                                </div>
+                            )}
                             <button type="submit" className="button" disabled={loading}>{loading ? 'Adicionando...' : 'Adicionar Serviço'}</button>
                         </form>
                     </Card>
@@ -381,6 +393,7 @@ const Gerenciar = ({ usuario }) => {
             {showEditModal && currentServicoToEdit && (
                 <EditServicoModal
                     servico={currentServicoToEdit}
+                    isSalao={isSalao}
                     onSave={handleSaveEditedServico}
                     onCancel={handleCancelEdit}
                     loading={loading}
