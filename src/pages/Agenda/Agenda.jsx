@@ -97,9 +97,15 @@ const Agenda = ({ usuario }) => {
         // Salva o agendamento primeiro
         await updateAgendamento(editingAgendamento.id, agendamentoData);
         
-        // Depois abre o modal de venda
+        // Buscar o valor do serviço nos servicosCadastrados
+        const servicoEncontrado = servicosCadastrados.find(
+          (s) => s.nome.toLowerCase() === editingAgendamento.servico_nome.toLowerCase()
+        );
+        const valorServico = servicoEncontrado?.valor_padrao || "";
+        
+        // Depois abre o modal de venda com o valor do serviço preenchido
         setAgendamentoPendente(editingAgendamento);
-        setValorVenda("");
+        setValorVenda(valorServico.toString());
         setFormaPagamento("");
         setShowVendaModal(true);
         handleCloseModal();
