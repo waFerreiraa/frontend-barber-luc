@@ -37,44 +37,18 @@ const Dashboard = ({ token, usuario }) => {
       setLoading(true);
       setError("");
 
-      if (usuario.tipo_usuario === "admin") {
-        // Admin: busca sumário e histórico em paralelo
-        const [dataSumario, dataHistorico] = await Promise.all([
-          fetchSumario(),
-          fetchHistorico(),
-        ]);
+      const dataSumario = await fetchSumario();
 
-        console.log("DEBUG: dataSumario =", dataSumario);
+      console.log("DEBUG: dataSumario =", dataSumario);
 
-        setSumario({
-          faturamentoDia: dataSumario.faturamento_dia,
-          faturamentoMes: dataSumario.faturamento_mes,
-        });
+      setSumario({
+        faturamentoDia: dataSumario.faturamento_dia,
+        faturamentoMes: dataSumario.faturamento_mes,
+      });
 
-        const hoje = new Date();
-        const mes = hoje.getMonth();
-        const ano = hoje.getFullYear();
-
-        const colaboradorVendas = dataHistorico.filter((v) => {
-          const dataVenda = new Date(v.data_venda);
-          return (
-            v.usuario_id !== usuario.id &&
-            dataVenda.getMonth() === mes &&
-            dataVenda.getFullYear() === ano
-          );
-        });
-
-        setVendasColaboradores(colaboradorVendas);
-      } else {
-        // Colaborador: busca apenas o sumário
-        const dataSumario = await fetchSumario();
-
-        console.log("DEBUG: dataSumario =", dataSumario);
-
-        setSumario({
-          faturamentoDia: dataSumario.faturamento_dia,
-          faturamentoMes: dataSumario.faturamento_mes,
-        });
+      // Admin usa vendasColaboradores já calculado no backend
+      if (usuario.tipo_usuario === "admin" && dataSumario.vendas_colaboradores) {
+        setVendasColaboradores(dataSumario.vendas_colaboradores);
       }
     } catch (err) {
       setError(err.message);

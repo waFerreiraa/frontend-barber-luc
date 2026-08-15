@@ -12,7 +12,7 @@ import {
 } from "../../services/api";
 import { toast } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
-import { FaPlus, FaHistory } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import "./RegistrarVenda.css";
 import { ThemeContext } from "../../contexts/ThemeContext";
 
@@ -224,7 +224,6 @@ const RegistrarVenda = ({ usuario }) => {
   );
 
   const headerLogo = isSalao ? Cabelo : Logo;
-  const centralLogo = usuario?.configuracoes?.logo_url || (isSalao ? Cabelo : Lucao);
 
   return (
     <div className="rv-container">
