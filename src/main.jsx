@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
+import './mobile.css';
+import './animations.css';
 import { BrowserRouter } from 'react-router-dom'; // Importa o BrowserRouter
 import { ThemeProvider } from './contexts/ThemeContext'; // Importa o ThemeProvider
 

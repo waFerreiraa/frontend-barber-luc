@@ -2,10 +2,94 @@
 .historico-filtros {
   display: flex;
   gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
   justify-content: center;
   flex-wrap: wrap;
 }
+
+@media (max-width: 600px) {
+  /* No celular os filtros rolam na horizontal em vez de quebrar em várias linhas */
+  .historico-filtros {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+    scrollbar-width: none;
+  }
+  .historico-filtros::-webkit-scrollbar { display: none; }
+  .historico-filtro-button { white-space: nowrap; flex: 0 0 auto; }
+}
+
+/* --- Resumo do período --- */
+.historico-resumo {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+  margin-bottom: 1.25rem;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.historico-resumo-principal {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.historico-resumo-rotulo,
+.historico-resumo-detalhe {
+  font-size: 0.82rem;
+  opacity: 0.75;
+}
+
+.historico-resumo-valor {
+  font-size: 1.9rem;
+  line-height: 1.1;
+  color: var(--cor-primaria);
+  font-variant-numeric: tabular-nums;
+}
+
+.historico-resumo-divisao {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.historico-resumo-divisao div {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.historico-resumo-divisao span {
+  font-size: 0.78rem;
+  opacity: 0.75;
+}
+
+.historico-resumo-divisao strong {
+  font-size: 1.05rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.historico-comissao-linha {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  font-size: 0.85rem;
+  margin: 0.35rem 0 0.5rem;
+  opacity: 0.85;
+}
+
+body.theme-salao .historico-resumo {
+  background: #fff;
+  border-color: #DDD2CA;
+}
+
+body.theme-salao .historico-resumo-divisao {
+  border-top-color: #DDD2CA;
+}
+
 
 .historico-filtro-button {
   background-color: rgba(255, 255, 255, 0.08);
@@ -416,3 +500,27 @@ body.theme-salao .historico-modal-cancel:hover {
     gap: 12px;
   }
 }
+
+/* --- Esqueleto de carregamento --- */
+.historico-skeleton { display: grid; gap: 0.75rem; }
+
+.historico-skeleton-item {
+  height: 72px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.05) 75%);
+  background-size: 200% 100%;
+  animation: historico-brilho 1.3s ease-in-out infinite;
+}
+
+body.theme-salao .historico-skeleton-item {
+  background: linear-gradient(90deg, #efe9e4 25%, #f8f4f0 50%, #efe9e4 75%);
+  background-size: 200% 100%;
+}
+
+@keyframes historico-brilho {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+.historico-header-item { cursor: pointer; }
+.historico-header-item:focus-visible { outline: 2px solid var(--cor-primaria); outline-offset: 2px; border-radius: 10px; }

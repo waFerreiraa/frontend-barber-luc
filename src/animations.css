@@ -1,0 +1,105 @@
+/* Movimento do sistema: curto, discreto e só em opacidade/posição.
+   Tudo é desligado para quem pede menos movimento (final do arquivo). */
+
+:root {
+  --mov-rapido: 140ms;
+  --mov-medio: 240ms;
+  --mov-suave: cubic-bezier(0.22, 0.8, 0.3, 1);
+}
+
+@keyframes mov-entrada {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes mov-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes mov-modal {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes mov-abrir {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Página: aparece suavemente ao trocar de tela.
+   fill-mode "backwards" não deixa transform ativo depois, então não afeta modais fixos nem a barra fixa. */
+.dashboard-container,
+.rv-container,
+.agenda-container,
+.equipe-container,
+.gerenciar-container,
+.admin-config-container,
+.login-container {
+  animation: mov-entrada var(--mov-medio) var(--mov-suave) backwards;
+}
+
+/* Listas: itens entram em sequência curta (só os primeiros) */
+.dashboard-card,
+.dashboard-collaborator-card,
+.agenda-card,
+.historico-item,
+.equipe-card,
+.gerenciar-servico-item {
+  animation: mov-entrada var(--mov-medio) var(--mov-suave) backwards;
+}
+
+:is(.dashboard-cards-grid, .dashboard-collaborators-grid, .agenda-list, .historico-list, .equipe-lista, .gerenciar-servicos-list) > :nth-child(1) { animation-delay: 40ms; }
+:is(.dashboard-cards-grid, .dashboard-collaborators-grid, .agenda-list, .historico-list, .equipe-lista, .gerenciar-servicos-list) > :nth-child(2) { animation-delay: 80ms; }
+:is(.dashboard-cards-grid, .dashboard-collaborators-grid, .agenda-list, .historico-list, .equipe-lista, .gerenciar-servicos-list) > :nth-child(3) { animation-delay: 120ms; }
+:is(.dashboard-cards-grid, .dashboard-collaborators-grid, .agenda-list, .historico-list, .equipe-lista, .gerenciar-servicos-list) > :nth-child(4) { animation-delay: 160ms; }
+:is(.dashboard-cards-grid, .dashboard-collaborators-grid, .agenda-list, .historico-list, .equipe-lista, .gerenciar-servicos-list) > :nth-child(n+5) { animation-delay: 200ms; }
+
+/* Detalhes do dia no histórico abrem com um fade curto */
+.historico-details { animation: mov-abrir var(--mov-medio) var(--mov-suave); }
+
+/* Modais: fundo aparece e a janela sobe um pouco */
+.modal-backdrop,
+.historico-modal-overlay { animation: mov-fade var(--mov-rapido) ease-out; }
+
+.modal-content,
+.historico-modal { animation: mov-modal var(--mov-medio) var(--mov-suave); }
+
+/* Botões e campos: mudança de estado suave, sem "transition: all" */
+.button,
+button[type="submit"] {
+  transition: background-color var(--mov-rapido) ease,
+              border-color var(--mov-rapido) ease,
+              color var(--mov-rapido) ease,
+              opacity var(--mov-rapido) ease,
+              transform 90ms ease;
+}
+
+.button:active:not(:disabled),
+button[type="submit"]:active:not(:disabled) { transform: scale(0.98); }
+
+input,
+select,
+textarea {
+  transition: border-color var(--mov-rapido) ease, box-shadow var(--mov-rapido) ease;
+}
+
+/* Calendário e abas de período */
+.calendario-celula,
+.calendario-nav,
+.historico-filtro-button,
+.equipe-periodo {
+  transition: background-color var(--mov-rapido) ease, color var(--mov-rapido) ease, border-color var(--mov-rapido) ease;
+}
+
+/* Barras de carregamento e indicadores já existentes ficam como estão */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

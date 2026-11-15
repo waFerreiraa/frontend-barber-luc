@@ -1,0 +1,207 @@
+/* Equipe: mobile-first, usa as variáveis de tema da empresa */
+.equipe-container {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0.5rem 0 3rem;
+  display: grid;
+  gap: 1.1rem;
+}
+
+.equipe-cabecalho h1 {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.6rem;
+  margin: 0;
+}
+
+.equipe-cabecalho p {
+  margin: 0.2rem 0 0;
+  font-size: 0.9rem;
+  opacity: 0.75;
+}
+
+.equipe-periodos {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.equipe-periodos::-webkit-scrollbar { display: none; }
+
+.equipe-periodo {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  min-height: 44px;
+  padding: 0 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: var(--surface-color);
+  color: var(--text-color);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.equipe-periodo.active {
+  background: var(--cor-primaria);
+  border-color: transparent;
+  color: var(--button-text-color);
+}
+
+.equipe-aviso { text-align: center; opacity: 0.75; }
+
+.equipe-totais {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.equipe-totais div {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 0.9rem 1rem;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.equipe-totais span { font-size: 0.78rem; opacity: 0.75; }
+.equipe-totais strong { font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+
+.equipe-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.equipe-card {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1rem;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.equipe-card-topo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.equipe-avatar {
+  flex: 0 0 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  background: var(--cor-primaria);
+  color: var(--button-text-color);
+}
+
+.equipe-identidade {
+  min-width: 0;
+  flex: 1;
+  display: grid;
+}
+
+.equipe-identidade strong {
+  overflow-wrap: anywhere;
+}
+
+.equipe-email {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.equipe-email { font-size: 0.8rem; opacity: 0.7; }
+
+.equipe-tipo {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+}
+
+.equipe-numeros {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+}
+
+.equipe-numeros div {
+  background: var(--input-bg-color);
+  border-radius: 10px;
+  padding: 0.55rem 0.75rem;
+}
+
+.equipe-numeros dt { font-size: 0.72rem; opacity: 0.7; }
+.equipe-numeros dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.equipe-comissao { display: grid; gap: 0.4rem; }
+.equipe-comissao label { font-size: 0.8rem; opacity: 0.8; }
+
+.equipe-comissao-campo { display: flex; gap: 0.6rem; }
+
+.equipe-input-wrapper { position: relative; flex: 1; }
+
+.equipe-input-wrapper input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 2rem 0 0.8rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--input-bg-color);
+  color: var(--text-color);
+  font: inherit;
+}
+
+.equipe-input-wrapper span {
+  position: absolute;
+  right: 0.8rem;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.equipe-salvar {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.equipe-salvar:disabled {
+  background: var(--input-bg-color);
+  color: var(--text-color);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.equipe-vazio {
+  text-align: center;
+  background: var(--surface-color);
+  border: 1px dashed var(--border-color);
+  border-radius: 16px;
+  padding: 2rem 1rem;
+  display: grid;
+  gap: 0.5rem;
+  justify-items: center;
+}
+
+.equipe-vazio p { margin: 0; opacity: 0.75; max-width: 32ch; }
+.equipe-vazio .button { text-decoration: none; margin-top: 0.5rem; }
+
+@media (min-width: 640px) {
+  .equipe-numeros { grid-template-columns: repeat(4, 1fr); }
+}

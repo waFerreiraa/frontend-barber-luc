@@ -229,11 +229,10 @@ export const loginUser = async (email, senha) => {
     tipo_usuario: data.tipo_usuario,
     empresa_id: data.empresa_id, // ✅ útil pro front (UI/debug)
     configuracoes: data.configuracoes || {}, // ✅ Salva as configurações
-    token: data.token,
   };
 
-  localStorage.setItem("token", usuario.token);
-  localStorage.setItem("user", JSON.stringify(usuario));
+  // O token fica só em "token"; o App grava o usuário (sem o token) ao receber o retorno.
+  localStorage.setItem("token", data.token);
 
   return usuario;
 };
@@ -273,6 +272,15 @@ export const gerarRelatorioGanhos = async (mes, ano) => {
   }
 };
 
+// Escapa texto vindo da API antes de colocá-lo no HTML do relatório
+const escapeHtml = (valor) =>
+  String(valor ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
 // Função auxiliar para gerar PDF com os dados
 const gerarPDFComDados = (dados) => {
   // Simples: criar um HTML e imprimir
@@ -293,8 +301,8 @@ const gerarPDFComDados = (dados) => {
         </style>
       </head>
       <body>
-        <h1>${dados.empresa_nome}</h1>
-        <h2>Relatório de Ganhos - ${String(dados.mes).padStart(2, '0')}/${dados.ano}</h2>
+        <h1>${escapeHtml(dados.empresa_nome)}</h1>
+        <h2>Relatório de Ganhos - ${String(Number(dados.mes)).padStart(2, '0')}/${Number(dados.ano)}</h2>
         
         ${dados.vendas.length === 0 ? 
           '<p style="text-align: center;">Nenhuma venda encontrada para o período.</p>' :
@@ -312,16 +320,16 @@ const gerarPDFComDados = (dados) => {
               <tbody>
                 ${dados.vendas.map(v => `
                   <tr>
-                    <td>${v.numero}</td>
-                    <td>${v.data}</td>
-                    <td>${v.cliente}</td>
-                    <td>${v.colaborador}</td>
-                    <td style="text-align: right;">R$ ${v.valor.toFixed(2)}</td>
+                    <td>${escapeHtml(v.numero)}</td>
+                    <td>${escapeHtml(v.data)}</td>
+                    <td>${escapeHtml(v.cliente)}</td>
+                    <td>${escapeHtml(v.colaborador)}</td>
+                    <td style="text-align: right;">R$ ${Number(v.valor).toFixed(2)}</td>
                   </tr>
                 `).join('')}
               </tbody>
             </table>
-            <div class="total">Total Geral: R$ ${dados.total_geral.toFixed(2)}</div>
+            <div class="total">Total Geral: R$ ${Number(dados.total_geral).toFixed(2)}</div>
           `
         }
       </body>
@@ -330,6 +338,9 @@ const gerarPDFComDados = (dados) => {
 
   // Abrir em nova janela e imprimir como PDF
   const novaJanela = window.open('', '_blank');
+  if (!novaJanela) {
+    throw new Error("Não foi possível abrir o relatório. Libere os pop-ups deste site e tente novamente.");
+  }
   novaJanela.document.write(html);
   novaJanela.document.close();
   
@@ -378,6 +389,21 @@ export const createInitialUserAndCompany = async (registrationData) => {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' }, // Endpoint público, sem token
     body: JSON.stringify(registrationData),
+  });
+  return handleResponse(response);
+};
+
+// --- EQUIPE (admin/dono) ---
+export const fetchEquipe = async () => {
+  const response = await fetch(`${BASE_URL}/api/auth/equipe`, { headers: { ...getAuthHeaders() } });
+  return handleResponse(response);
+};
+
+export const atualizarComissaoColaborador = async (colaboradorId, percentual) => {
+  const response = await fetch(`${BASE_URL}/api/auth/colaboradores/${colaboradorId}/comissao`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+    body: JSON.stringify({ percentual_comissao: percentual }),
   });
   return handleResponse(response);
 };
