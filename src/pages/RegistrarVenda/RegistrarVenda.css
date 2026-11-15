@@ -626,3 +626,101 @@ body.theme-salao .rv-submit-button:hover {
     }
     
 }
+
+/* --- Melhorias de uso no celular --- */
+.rv-service-qtd {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.05rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: var(--cor-primaria);
+  color: var(--button-text-color);
+}
+
+.rv-service-item:focus-visible {
+  outline: 2px solid var(--cor-primaria);
+  outline-offset: 2px;
+}
+
+.rv-pagamento-opcoes {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+@media (min-width: 480px) {
+  .rv-pagamento-opcoes { grid-template-columns: repeat(4, 1fr); }
+}
+
+.rv-pagamento-opcao {
+  min-height: 48px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.rv-pagamento-opcao.active {
+  background: var(--cor-primaria);
+  color: var(--button-text-color);
+  border-color: transparent;
+}
+
+body.theme-salao .rv-pagamento-opcao {
+  background: #fff;
+  border-color: #DDD2CA;
+  color: #7A6B62;
+}
+
+body.theme-salao .rv-pagamento-opcao.active {
+  background: #7A6B62;
+  color: #fff;
+}
+
+.rv-finalizar-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.rv-finalizar-resumo {
+  display: grid;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.rv-finalizar-resumo span { font-size: 0.78rem; opacity: 0.7; }
+.rv-finalizar-resumo strong { font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+
+.rv-finalizar-bar .rv-submit-button {
+  flex: 1;
+  width: auto;
+  margin-top: 0;
+}
+
+@media (max-width: 600px) {
+  /* Total e botão ficam sempre visíveis, sem precisar rolar até o fim da página */
+  .rv-finalizar-bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    margin: 1.25rem -1rem -1rem;
+    padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+    background: var(--surface-color);
+    border-top: 1px solid var(--border-color);
+    box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.18);
+  }
+
+  .rv-finalizar-bar .rv-submit-button {
+    min-height: 52px;
+    padding: 0 1rem;
+    font-size: 1.1rem;
+  }
+}

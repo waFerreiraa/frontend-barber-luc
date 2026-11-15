@@ -8,6 +8,8 @@ import Lucao from "../../assets/LucaoLogo.png";
 import "../RegistrarVenda/RegistrarVenda.css";
 import "./Historico.css";
 import { ThemeContext } from "../../contexts/ThemeContext";
+import { PERIODOS, filtrarPorPeriodo, descreverIntervalo } from "../../utils/periodo";
+import { formatarMoeda } from "../../utils/comissao";
 
 const Historico = ({ usuario }) => {
   const { tema } = useContext(ThemeContext);
@@ -91,47 +93,15 @@ const Historico = ({ usuario }) => {
   };
 
   // Filtra as vendas com base no período selecionado
-  const vendasFiltradas = useMemo(() => {
-    if (!vendas.length) return [];
+  const vendasFiltradas = useMemo(
+    () => filtrarPorPeriodo(vendas, filtroPeriodo),
+    [vendas, filtroPeriodo]
+  );
 
-    const hoje = new Date();
-    const anoHoje = hoje.getFullYear();
-    const mesHoje = hoje.getMonth();
-    const diaHoje = hoje.getDate();
-
-    switch (filtroPeriodo) {
-      case 'dia': {
-        return vendas.filter(venda => {
-          const dataVenda = new Date(venda.data_venda);
-          return dataVenda.getFullYear() === anoHoje &&
-                 dataVenda.getMonth() === mesHoje &&
-                 dataVenda.getDate() === diaHoje;
-        });
-      }
-      case 'semana': {
-        const primeiroDiaSemana = new Date(hoje);
-        primeiroDiaSemana.setDate(hoje.getDate() - hoje.getDay()); // Domingo
-        primeiroDiaSemana.setHours(0, 0, 0, 0);
-        
-        const ultimoDiaSemana = new Date(primeiroDiaSemana);
-        ultimoDiaSemana.setDate(primeiroDiaSemana.getDate() + 7);
- 
-        return vendas.filter(venda => {
-          const dataVenda = new Date(venda.data_venda);
-          return dataVenda >= primeiroDiaSemana && dataVenda < ultimoDiaSemana;
-        });
-      }
-      case 'mes': {
-        return vendas.filter(venda => {
-          const dataVenda = new Date(venda.data_venda);
-          return dataVenda.getFullYear() === anoHoje &&
-                 dataVenda.getMonth() === mesHoje;
-        });
-      }
-      default:
-        return vendas;
-    }
-  }, [vendas, filtroPeriodo]);
+  const totalPeriodo = useMemo(
+    () => vendasFiltradas.reduce((soma, v) => soma + Number(v.valor_total || 0), 0),
+    [vendasFiltradas]
+  );
 
   // Agrupa as vendas filtradas por dia
   const vendasPorDia = vendasFiltradas.reduce((acc, venda) => {
@@ -165,13 +135,41 @@ const Historico = ({ usuario }) => {
 
         <h2 style={{ textAlign: 'center' }}>Histórico de Vendas</h2>
 
-        {loading && <p>Carregando histórico...</p>}
+        {loading && (
+          <div className="historico-skeleton" role="status" aria-label="Carregando histórico">
+            {[0, 1, 2, 3].map((n) => (
+              <div key={n} className="historico-skeleton-item" />
+            ))}
+          </div>
+        )}
 
-        <div className="historico-filtros">
-          <button className={`historico-filtro-button ${filtroPeriodo === 'dia' ? 'active' : ''}`} onClick={() => setFiltroPeriodo('dia')}>Hoje</button>
-          <button className={`historico-filtro-button ${filtroPeriodo === 'semana' ? 'active' : ''}`} onClick={() => setFiltroPeriodo('semana')}>Esta Semana</button>
-          <button className={`historico-filtro-button ${filtroPeriodo === 'mes' ? 'active' : ''}`} onClick={() => setFiltroPeriodo('mes')}>Este Mês</button>
+        <div className="historico-filtros" role="group" aria-label="Período">
+          {PERIODOS.map((periodo) => (
+            <button
+              key={periodo.id}
+              type="button"
+              className={`historico-filtro-button ${filtroPeriodo === periodo.id ? 'active' : ''}`}
+              aria-pressed={filtroPeriodo === periodo.id}
+              onClick={() => setFiltroPeriodo(periodo.id)}
+            >
+              {periodo.rotulo}
+            </button>
+          ))}
         </div>
+
+        {!loading && (
+          <section className="historico-resumo" aria-label="Resumo do período">
+            <div className="historico-resumo-principal">
+              <span className="historico-resumo-rotulo">
+                Faturado · {descreverIntervalo(filtroPeriodo)}
+              </span>
+              <strong className="historico-resumo-valor">{formatarMoeda(totalPeriodo)}</strong>
+              <span className="historico-resumo-detalhe">
+                {vendasFiltradas.length} {vendasFiltradas.length === 1 ? "venda" : "vendas"}
+              </span>
+            </div>
+          </section>
+        )}
 
         {!loading &&
           (Object.keys(vendasPorDia).length === 0 ? (
@@ -192,12 +190,20 @@ const Historico = ({ usuario }) => {
                 );
 
                 return (
-                  <li
-                    key={data}
-                    className="historico-item"
-                    onClick={() => toggleDateDetails(data)}
-                  >
-                    <div className="historico-header-item">
+                  <li key={data} className="historico-item">
+                    <div
+                      className="historico-header-item"
+                      role="button"
+                      tabIndex={0}
+                      aria-expanded={expandedDate === data}
+                      onClick={() => toggleDateDetails(data)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          toggleDateDetails(data);
+                        }
+                      }}
+                    >
                       <div className="historico-meta">
                         <div className="historico-date">
                           <strong>{data}</strong>

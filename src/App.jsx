@@ -1,14 +1,15 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
+import React, { useState, useEffect, useContext, useCallback, lazy, Suspense } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { ThemeContext } from "./contexts/ThemeContext";
 import Navigation from "./components/Navigation/Navigation";
-import Dashboard from "./pages/DashBoard/Dashboard.jsx";
-import RegistrarVenda from "./pages/RegistrarVenda/RegistrarVenda.jsx";
-import Historico from "./pages/Historico/Historico.jsx";
-import Gerenciar from "./pages/Gerenciar/Gerenciar.jsx";
-import Agenda from "./pages/Agenda/Agenda.jsx"; // Importar o novo componente Agenda
-import AdminConfig from "./pages/AdminConfig/AdminConfig.jsx"; // ✅ NOVO: Importar página de Admin
-import Configuracoes from "./pages/Configuracao/Configuracoes.jsx"; // ✅ NOVO: Importar página de Configurações
+const Dashboard = lazy(() => import("./pages/DashBoard/Dashboard.jsx"));
+const RegistrarVenda = lazy(() => import("./pages/RegistrarVenda/RegistrarVenda.jsx"));
+const Historico = lazy(() => import("./pages/Historico/Historico.jsx"));
+const Gerenciar = lazy(() => import("./pages/Gerenciar/Gerenciar.jsx"));
+const Equipe = lazy(() => import("./pages/Equipe/Equipe.jsx"));
+const Agenda = lazy(() => import("./pages/Agenda/Agenda.jsx"));
+const AdminConfig = lazy(() => import("./pages/AdminConfig/AdminConfig.jsx"));
+const Configuracoes = lazy(() => import("./pages/Configuracao/Configuracoes.jsx"));
 import EsqueciSenha from "./pages/Login/EsqueciSenha.jsx"; // ✅ NOVO
 import ResetarSenha from "./pages/Login/ResetarSenha.jsx"; // ✅ NOVO
 import Login from "./pages/Login/Login.jsx";
@@ -16,24 +17,28 @@ import { registerLogoutHandler } from "./services/api";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+// Lê o usuário salvo antes do primeiro render, para o F5 não redirecionar para /login
+// (e depois para /dashboard), preservando a rota atual.
+const lerUsuarioSalvo = () => {
+  try {
+    const savedUser = localStorage.getItem("user");
+    if (!savedUser || !localStorage.getItem("token")) return null;
+
+    const parsedUser = JSON.parse(savedUser);
+    return {
+      ...parsedUser,
+      tipo_usuario: parsedUser.tipo_usuario || parsedUser.tipo,
+    };
+  } catch {
+    return null;
+  }
+};
+
 function App() {
   const [isNavOpen, setIsNavOpen] = useState(false);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(lerUsuarioSalvo);
   const { setTema } = useContext(ThemeContext);
   const navigate = useNavigate(); // Hook para navegar programaticamente
-
-  // Inicializa usuário a partir do localStorage
-  useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-    if (savedUser) {
-      const parsedUser = JSON.parse(savedUser);
-      const usuarioNormalizado = {
-        ...parsedUser,
-        tipo_usuario: parsedUser.tipo_usuario || parsedUser.tipo,
-      };
-      setUser(usuarioNormalizado);
-    }
-  }, []);
 
   useEffect(() => {
     if (user?.configuracoes?.layout_tipo) {
@@ -70,9 +75,10 @@ function App() {
   }, [handleLogout]);
 
   const handleLogin = (loggedUser) => {
+    const { token: _token, ...usuarioSemToken } = loggedUser;
     const usuarioNormalizado = {
-      ...loggedUser,
-      tipo_usuario: loggedUser.tipo_usuario || loggedUser.tipo,
+      ...usuarioSemToken,
+      tipo_usuario: usuarioSemToken.tipo_usuario || usuarioSemToken.tipo,
     };
     setUser(usuarioNormalizado);
     localStorage.setItem("user", JSON.stringify(usuarioNormalizado));
@@ -139,17 +145,20 @@ function App() {
           ☰
         </button>
 
+        <Suspense fallback={<div className="page-loading" role="status">Carregando...</div>}>
         <Routes>
           <Route path="/dashboard" element={<Dashboard usuario={user} />} />
           <Route path="/registrar-venda" element={<RegistrarVenda usuario={user} />} />
           <Route path="/historico" element={<Historico usuario={user} />} />
           <Route path="/gerenciar" element={<Gerenciar usuario={user} />} />
+          {(user.tipo_usuario === 'admin' || user.tipo_usuario === 'dono') && <Route path="/equipe" element={<Equipe usuario={user} />} />}
           <Route path="/agenda" element={<Agenda usuario={user} />} />
           <Route path="/configuracoes" element={<Configuracoes />} />
           {/* Rota de Admin, acessível apenas ao dono */}
           {user.tipo_usuario === 'dono' && <Route path="/admin" element={<AdminConfig onConfigSave={handleConfigSave} />} />}
           <Route path="*" element={<Navigate to="/dashboard" />} />
         </Routes>
+        </Suspense>
       </main>
 
       {isNavOpen && (

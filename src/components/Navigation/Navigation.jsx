@@ -1,57 +1,129 @@
-import React from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { NavLink } from "react-router-dom";
 import {
-  FaHome,
-  FaCashRegister,
-  FaHistory,
-  FaUsersCog,
-  FaTools,
-  FaCog,
-  FaSignOutAlt,
-  FaCalendarAlt,
-} from "react-icons/fa";
+  LuLayoutDashboard,
+  LuBanknote,
+  LuCalendarDays,
+  LuHistory,
+  LuUsers,
+  LuUserCog,
+  LuWrench,
+  LuSettings,
+  LuLogOut,
+  LuX,
+} from "react-icons/lu";
+import { ThemeContext } from "../../contexts/ThemeContext";
+import LogoBarbearia from "../../assets/penteado.png";
+import LogoSalao from "../../assets/mulher.png";
 import "./Navigation.css";
 
-const Navigation = ({ isNavOpen, setIsNavOpen, onLogout, usuario }) => {
-  const handleLinkClick = () => {
-    setIsNavOpen(false);
-  };
+const ROTULOS_TIPO = {
+  admin: "Administrador",
+  dono: "Dono",
+  colaborador: "Colaborador",
+};
 
-  const isAdmin = usuario?.tipo_usuario === 'admin' || usuario?.tipo_usuario === 'dono';
-  const isDono = usuario?.tipo_usuario === 'dono';
+const Navigation = ({ isNavOpen, setIsNavOpen, onLogout, usuario }) => {
+  const { tema } = useContext(ThemeContext);
+  const botaoFecharRef = useRef(null);
+
+  const isAdmin = usuario?.tipo_usuario === "admin" || usuario?.tipo_usuario === "dono";
+  const isDono = usuario?.tipo_usuario === "dono";
+
+  const nomeEmpresa =
+    usuario?.configuracoes?.nome_exibicao || (tema === "salao" ? "Salão de Beleza" : "Barbearia");
+  const logo = usuario?.configuracoes?.logo_url || (tema === "salao" ? LogoSalao : LogoBarbearia);
+  const rotuloTipo = ROTULOS_TIPO[usuario?.tipo_usuario] || "";
+
+  const fecharMenu = () => setIsNavOpen(false);
+
+  // Com o menu aberto no celular: Esc fecha, a página atrás não rola e o foco vai para o menu.
+  useEffect(() => {
+    if (!isNavOpen) return undefined;
+
+    const aoTeclar = (evento) => {
+      if (evento.key === "Escape") setIsNavOpen(false);
+    };
+    const overflowAnterior = document.body.style.overflow;
+
+    document.addEventListener("keydown", aoTeclar);
+    document.body.style.overflow = "hidden";
+    botaoFecharRef.current?.focus();
+
+    return () => {
+      document.removeEventListener("keydown", aoTeclar);
+      document.body.style.overflow = overflowAnterior;
+    };
+  }, [isNavOpen, setIsNavOpen]);
+
+  const Item = ({ to, icone, children }) => (
+    <li>
+      <NavLink
+        to={to}
+        onClick={fecharMenu}
+        className={({ isActive }) => (isActive ? "active" : "")}
+      >
+        {icone}
+        <span>{children}</span>
+      </NavLink>
+    </li>
+  );
 
   return (
-    <nav className={`sidebar ${isNavOpen ? "open" : ""}`}>
+    <nav className={`sidebar ${isNavOpen ? "open" : ""}`} aria-label="Menu principal">
       <div className="sidebar-header">
-        <h2>Menu</h2>
-        <button onClick={() => setIsNavOpen(false)} className="close-button">&times;</button>
+        <div className="sidebar-brand">
+          <img className="sidebar-logo" src={logo} alt="" />
+          <strong className="sidebar-empresa">{nomeEmpresa}</strong>
+        </div>
+        <button
+          ref={botaoFecharRef}
+          type="button"
+          onClick={fecharMenu}
+          className="close-button"
+          aria-label="Fechar menu"
+        >
+          <LuX />
+        </button>
       </div>
 
-      {/* A lista principal de navegação */}
-      <ul className="main-nav-list">
-        <li><NavLink to="/dashboard" onClick={handleLinkClick} className={({ isActive }) => isActive ? 'active' : ''}><FaHome /> <span>Dashboard</span></NavLink></li>
-        <li><NavLink to="/registrar-venda" onClick={handleLinkClick} className={({ isActive }) => isActive ? 'active' : ''}><FaCashRegister /> <span>Registrar Venda</span></NavLink></li>
-        <li><NavLink to="/agenda" onClick={handleLinkClick} className={({ isActive }) => isActive ? 'active' : ''}><FaCalendarAlt /> <span>Agenda</span></NavLink></li>
-        <li><NavLink to="/historico" onClick={handleLinkClick} className={({ isActive }) => isActive ? 'active' : ''}><FaHistory /> <span>Histórico</span></NavLink></li>
-        {isAdmin && (
-          <li><NavLink to="/gerenciar" onClick={handleLinkClick} className={({ isActive }) => isActive ? 'active' : ''}><FaUsersCog /> <span>Gerenciar</span></NavLink></li>
-        )}
-        {isDono && (
-          <li><NavLink to="/admin" onClick={handleLinkClick} className={({ isActive }) => isActive ? 'active' : ''}><FaTools /> <span>Admin</span></NavLink></li>
-        )}
-      </ul>
+      <div className="sidebar-scroll">
+        <ul className="main-nav-list">
+          <Item to="/dashboard" icone={<LuLayoutDashboard />}>Dashboard</Item>
+          <Item to="/registrar-venda" icone={<LuBanknote />}>Registrar Venda</Item>
+          <Item to="/agenda" icone={<LuCalendarDays />}>Agenda</Item>
+          <Item to="/historico" icone={<LuHistory />}>Histórico</Item>
+        </ul>
 
-      {/* Itens do rodapé, agora dentro de uma lista válida */}
+        {isAdmin && (
+          <>
+            <p className="sidebar-section-title">Gestão</p>
+            <ul className="main-nav-list">
+              <Item to="/equipe" icone={<LuUsers />}>Equipe</Item>
+              <Item to="/gerenciar" icone={<LuUserCog />}>Gerenciar</Item>
+              {isDono && <Item to="/admin" icone={<LuWrench />}>Admin</Item>}
+            </ul>
+          </>
+        )}
+      </div>
+
       <div className="sidebar-footer">
+        {usuario?.nome && (
+          <div className="sidebar-usuario">
+            <span className="sidebar-avatar" aria-hidden="true">
+              {usuario.nome.trim().charAt(0).toUpperCase()}
+            </span>
+            <div className="sidebar-usuario-texto">
+              <strong>{usuario.nome}</strong>
+              {rotuloTipo && <span>{rotuloTipo}</span>}
+            </div>
+          </div>
+        )}
         <ul>
+          <Item to="/configuracoes" icone={<LuSettings />}>Configurações</Item>
           <li>
-            <NavLink to="/configuracoes" onClick={handleLinkClick} className={({ isActive }) => isActive ? 'active' : ''}>
-              <FaCog /> <span>Configurações</span>
-            </NavLink>
-          </li>
-          <li>
-            <button onClick={onLogout} className="logout-button">
-              <FaSignOutAlt /> <span>Sair</span>
+            <button type="button" onClick={onLogout} className="logout-button">
+              <LuLogOut /> <span>Sair</span>
             </button>
           </li>
         </ul>

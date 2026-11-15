@@ -40,7 +40,9 @@ const Login = ({ onLogin }) => {
         geral:
           err.status === 401
             ? "⚠️ Email ou senha incorretos."
-            : "⚠️ Erro ao tentar fazer login. Verifique suas credenciais.",
+            : err.status === 429
+              ? `⚠️ ${err.message}`
+              : "⚠️ Erro ao tentar fazer login. Verifique suas credenciais.",
       }));
     } finally {
       setLoading(false);

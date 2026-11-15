@@ -39,6 +39,7 @@ const Gerenciar = ({ usuario }) => {
         email: '',
         senha: '',
         tipo_usuario: 'colaborador',
+        percentual_comissao: '',
     });
 
     const [isAdmin, setIsAdmin] = useState(false); // Estado para verificar se é admin
@@ -126,9 +127,17 @@ const Gerenciar = ({ usuario }) => {
         e.preventDefault();
         setLoading(true);
         try {
-            await createCollaborator(novoColaborador);
+            const percentual = novoColaborador.percentual_comissao === ''
+                ? null
+                : Number(String(novoColaborador.percentual_comissao).replace(',', '.'));
+            if (percentual !== null && (Number.isNaN(percentual) || percentual < 0 || percentual > 100)) {
+                toast.error('A porcentagem deve estar entre 0 e 100.');
+                setLoading(false);
+                return;
+            }
+            await createCollaborator({ ...novoColaborador, percentual_comissao: percentual });
             toast.success(`Colaborador "${novoColaborador.nome}" criado com sucesso!`);
-            setNovoColaborador({ nome: '', email: '', senha: '', tipo_usuario: 'colaborador' });
+            setNovoColaborador({ nome: '', email: '', senha: '', tipo_usuario: 'colaborador', percentual_comissao: '' });
             setVisibleForm(null); // Fecha o formulário
         } catch (err) {
             toast.error(err.message || 'Erro ao criar colaborador.');
@@ -319,6 +328,22 @@ const Gerenciar = ({ usuario }) => {
                                     <option value="colaborador">Colaborador</option>
                                     <option value="admin">Admin</option>
                                 </select>
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="percentual_comissao">Porcentagem do colaborador (%)</label>
+                                <input
+                                    id="percentual_comissao"
+                                    type="number"
+                                    inputMode="decimal"
+                                    name="percentual_comissao"
+                                    min="0"
+                                    max="100"
+                                    step="0.01"
+                                    placeholder="Ex.: 50"
+                                    value={novoColaborador.percentual_comissao}
+                                    onChange={handleNewCollaboratorChange}
+                                />
+                                <small>Parte de cada venda que fica com o colaborador. O resto é da empresa. Pode deixar em branco.</small>
                             </div>
                             <button type="submit" className="button" disabled={loading}>
                                 {loading ? 'Criando...' : 'Criar Colaborador'}

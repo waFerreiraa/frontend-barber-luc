@@ -1,0 +1,170 @@
+/* Ajustes de responsividade para celular.
+   Fica em um arquivo só (importado por último no main.jsx) para ser fácil de revisar. */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Alvos de toque confortáveis (mínimo recomendado: 44px) */
+body .button,
+body button.button,
+body input:not([type="checkbox"]):not([type="radio"]),
+body select {
+  min-height: 44px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Menu lateral: altura segura para a barra do navegador do celular */
+  body .sidebar {
+    height: 100vh;
+    height: 100dvh;
+    width: min(300px, 86vw);
+    overscroll-behavior: contain;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Botão do menu sempre visível ao rolar a página */
+  body .hamburger-button {
+    position: fixed;
+    top: calc(0.75rem + env(safe-area-inset-top));
+    left: 0.75rem;
+    width: 44px;
+    height: 44px;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    font-size: 1.6rem;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--surface-color) 92%, transparent);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+  }
+
+  body .main-content {
+    /* Quem rola no celular é a página; sem isso a barra fixa de baixo não funciona */
+    overflow: visible;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 600px) {
+  /* Páginas sem cabeçalho próprio precisam liberar espaço para o botão do menu */
+  body .gerenciar-container,
+  body .admin-config-container {
+    padding-top: 4.5rem;
+  }
+
+  body .gerenciar-container h1,
+  body .gerenciar-container h2 {
+    font-size: 1.7rem;
+    margin-bottom: 1.25rem;
+  }
+
+  body .equipe-container {
+    padding: 4.5rem 1rem 4rem;
+  }
+
+  /* Cabeçalhos compactos: o conteúdo aparece sem precisar rolar tanto */
+  body .rv-header,
+  body .dashboard-header,
+  body .agenda-header {
+    padding: 0.75rem 1rem 0.75rem 4.25rem;
+    min-height: 64px;
+    gap: 0.75rem;
+  }
+
+  body .dashboard-header {
+    max-width: none;
+    margin-bottom: 0.75rem;
+    padding-left: 3.25rem;
+  }
+
+  body .dashboard-container {
+    padding: 0.75rem 0 0;
+    min-height: 100dvh;
+  }
+
+  body .rv-header-text,
+  body .dashboard-header-text {
+    font-size: 1.35rem;
+    line-height: 1.15;
+  }
+
+  body .rv-header-logo img,
+  body .dashboard-header-logo img {
+    width: 84px;
+    height: auto;
+  }
+
+  body .rv-central-logo,
+  body .dashboard-central-logo {
+    width: 64px;
+    height: 64px;
+  }
+
+  body .rv-top-visuals,
+  body .dashboard-top-visuals {
+    margin-bottom: 0.5rem;
+  }
+
+  /* 100vw gera rolagem lateral quando há barra de rolagem; 100% evita isso */
+  body .rv-main-card,
+  body .dashboard-main-card {
+    width: 100%;
+    min-height: calc(100dvh - 90px);
+  }
+
+  body .rv-container {
+    min-height: 100dvh;
+    /* "clip" corta o excesso sem criar uma área de rolagem, o que quebraria a barra fixa de baixo */
+    overflow-x: clip;
+  }
+
+  /* Listas rolam com a página, sem "janela" de rolagem dentro da página */
+  body .historico-list {
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+  }
+
+  /* As listas crescem e a página rola; total e botão ficam na barra fixa de baixo */
+  body .rv-services-section,
+  body .rv-itens-adicionados {
+    max-height: none;
+    overflow: visible;
+  }
+
+  body .rv-remove-button,
+  body .historico-delete-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Evita o zoom automático do iPhone ao tocar em campos */
+  body input,
+  body select,
+  body textarea {
+    font-size: 16px;
+  }
+}
+
+/* Indicador simples enquanto uma tela carrega sob demanda */
+body .page-loading {
+  display: grid;
+  place-items: center;
+  min-height: 40vh;
+  opacity: 0.7;
+}
