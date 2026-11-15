@@ -387,7 +387,7 @@ export const createInitialUserAndCompany = async (registrationData) => {
   // registrationData deve conter: empresa_nome, nome, email, senha, layout_tipo
   const response = await fetch(`${BASE_URL}/api/registro`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' }, // Endpoint público, sem token
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() }, // Só o dono pode criar empresa
     body: JSON.stringify(registrationData),
   });
   return handleResponse(response);
