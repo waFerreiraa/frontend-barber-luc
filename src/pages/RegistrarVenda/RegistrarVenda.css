@@ -751,3 +751,22 @@ body.theme-salao .rv-pagamento-opcao.active {
     outline-offset: 2px;
     border-radius: 12px;
 }
+
+/* Serviços adicionados: com muitos itens, a lista rola por dentro (cabem ~5 à vista) */
+.rv-itens-lista {
+    max-height: 18rem;
+    overflow-y: auto;
+    padding-right: 0.35rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--text-color) 30%, transparent) transparent;
+}
+
+.rv-itens-lista::-webkit-scrollbar {
+    width: 6px;
+}
+
+.rv-itens-lista::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--text-color) 30%, transparent);
+    border-radius: 6px;
+}
