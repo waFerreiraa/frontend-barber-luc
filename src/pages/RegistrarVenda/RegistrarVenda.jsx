@@ -5,7 +5,6 @@ import Cabelo from "../../assets/mulher.png";
 import Lucao from "../../assets/LucaoLogo.png";
 import React, { useState, useEffect, useContext, useMemo } from "react";
 import {
-  fetchClientes,
   createCliente,
   fetchTiposServicos,
   createVenda,
@@ -32,7 +31,6 @@ const RegistrarVenda = ({ usuario }) => {
   const isSalao = tema === 'salao';
   const emojiLateral = isSalao ? '💅' : '💈';
 
-  const [clientes, setClientes] = useState([]);
   const [servicos, setServicos] = useState([]);
   const [nomeCliente, setNomeCliente] = useState("");
   const [itens, setItens] = useState([]);
@@ -41,14 +39,10 @@ const RegistrarVenda = ({ usuario }) => {
   const [formaPagamento, setFormaPagamento] = useState(""); // Novo estado para a forma de pagamento
   const [loading, setLoading] = useState(false);
 
+  // Só os serviços são carregados; o cliente é apenas o nome digitado.
   const loadData = async () => {
     try {
-      const [clientesData, servicosData] = await Promise.all([
-        fetchClientes(),
-        fetchTiposServicos(),
-      ]);
-      setClientes(clientesData);
-      setServicos(servicosData);
+      setServicos(await fetchTiposServicos());
     } catch (err) {
       toast.error(err.message);
     }
@@ -56,7 +50,7 @@ const RegistrarVenda = ({ usuario }) => {
 
   useEffect(() => {
     loadData();
-  }, []); // Este useEffect carrega dados que não dependem de props, então o array vazio está correto.
+  }, []);
 
   useEffect(() => {
     const novoTotal = itens.reduce(
@@ -95,18 +89,11 @@ const RegistrarVenda = ({ usuario }) => {
     setItens(novaLista);
   };
 
+  // O servidor reaproveita o cliente se já existir um com esse nome; senão, cadastra.
   const getOrCreateCliente = async () => {
     const nomeLimpo = nomeCliente.trim();
     if (!nomeLimpo) throw new Error("O nome do cliente não pode estar vazio.");
-
-    const clienteExistente = clientes.find(
-      (c) => c.nome.toLowerCase() === nomeLimpo.toLowerCase()
-    );
-    if (clienteExistente) return clienteExistente;
-
-    const novoCliente = await createCliente({ nome: nomeLimpo, telefone: "" });
-    loadData();
-    return novoCliente;
+    return createCliente({ nome: nomeLimpo, telefone: "" });
   };
 
   const handleSubmit = async () => {
@@ -159,21 +146,15 @@ const RegistrarVenda = ({ usuario }) => {
           value={nomeCliente}
           onChange={(e) => setNomeCliente(e.target.value)}
           placeholder="Nome do Cliente"
-          list="rv-clientes-lista"
           autoComplete="off"
           enterKeyHint="next"
           required
         />
-        <datalist id="rv-clientes-lista">
-          {clientes.map((cliente) => (
-            <option key={cliente.id} value={cliente.nome} />
-          ))}
-        </datalist>
       </section>
 
       <section className="rv-services-section">
         <h3>Corte Requisitado</h3>
-        <div className="rv-services-list">
+        <div className="rv-services-list rv-services-rolagem" tabIndex={0} aria-label="Lista de serviços">
           {servicos.map((servico) => {
             const quantidade = quantidadePorServico[servico.id] || 0;
             return (
